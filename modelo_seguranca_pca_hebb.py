@@ -9,6 +9,7 @@ from sklearn.decomposition import PCA
 from scipy.stats import chi2
 
 from baseline_modelo import save_baseline
+from src.hebbian import historical_prototype, train_hebbian
 
 # ============================================================
 # 2. FUNÇÕES AUXILIARES
@@ -960,7 +961,8 @@ def main():
     # 9. PROTÓTIPO HISTÓRICO DA SEGURANÇA
     # ============================================================
 
-    H = P.mean(axis=0)
+    # Representações repetidas não podem multiplicar sua influência em H.
+    H = historical_prototype(P)
     H_norm = normalize_vector(H)
 
     C_security = C[0]
@@ -975,17 +977,8 @@ def main():
     # 10. TREINAMENTO HEBBIANO
     # ============================================================
 
-    W = C_security_norm.copy()
-
-    hebb_history = [W.copy()]
-
-    for project in P:
-        project_norm = normalize_vector(project)
-
-        W = W + ETA * project_norm
-        W = normalize_vector(W)
-
-        hebb_history.append(W.copy())
+    # O treinador elimina vetores idênticos em ordem estável por padrão.
+    W, hebb_history = train_hebbian(P, C_security_norm, eta=ETA)
 
 
     sim_hebb_concept = float(

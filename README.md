@@ -58,3 +58,21 @@ para carregar os arquivos. Os carregadores rejeitam esquemas diferentes de 42
 características, códigos repetidos (inclusive entre partições), classes
 desconhecidas, campos de proveniência vazios, valores não numéricos, infinitos,
 fora da escala de 0 a 1 ou vetores inteiramente zerados.
+
+## Auditoria de vetores repetidos
+
+`src.dataset_audit.audit_feature_vectors` reporta o total de projetos, vetores
+únicos, frequência e projetos de cada vetor, características constantes, nunca
+preenchidas (zero em todo o corpus) e presentes em pelo menos 90% dos projetos.
+Também lista pares com similaridade de cosseno a partir de 0,99. Esse limiar só
+gera candidatos para revisão humana; similaridade não prova identidade.
+
+Cada grupo idêntico deve receber no registro de curadoria uma das decisões
+`same_project`, `different_projects_incomplete_data`, `equivalent_projects` ou
+`insufficient_coding_granularity`, além de `duplicate_justification`. Projetos
+distintos só são aceitos com justificativa da representação coincidente.
+
+Para impedir peso desproporcional, `historical_prototype` calcula `H` sobre os
+vetores únicos e `train_hebbian` elimina representações idênticas antes de
+construir `W` por padrão. A opção `deduplicate=False` existe apenas para
+reprodução explícita de resultados legados.
