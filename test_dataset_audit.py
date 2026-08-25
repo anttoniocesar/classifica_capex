@@ -1,7 +1,7 @@
 import pandas as pd
 
 from src.data import PROJECT_PARTITIONS, load_project_partitions
-from src.dataset_audit import REQUIRED_BOUNDARIES, audit_dataset
+from src.dataset_audit import REQUIRED_BOUNDARIES, audit_dataset, audit_feature_vectors
 from src.schema import CLASSES
 
 
@@ -34,3 +34,14 @@ def test_familia_nao_pode_vazar_entre_particoes():
     assert "family_leakage" in issue_types
     assert "identical_vectors_across_splits" in issue_types
     assert set(report["class_counts"]) <= set(CLASSES)
+
+
+def test_auditoria_conta_vetores_e_exige_decisao_documentada():
+    source = pd.read_csv(PROJECT_PARTITIONS["train"]).iloc[[0]]
+    copy = source.copy()
+    copy.loc[:, "project_code"] = "COPIA"
+    report = audit_feature_vectors({"train": pd.concat([source, copy])})
+    assert report["total_projects"] == 2
+    assert report["unique_vectors"] == 1
+    assert report["vector_frequency"][0]["frequency"] == 2
+    assert report["exact_duplicates"][0]["review_status"] == "pending_human_review"
