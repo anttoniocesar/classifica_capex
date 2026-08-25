@@ -24,6 +24,33 @@ precisão-alvo; ela falha explicitamente se receber apenas os 19 projetos de
 Segurança. Cada decisão e cada linha exportada registra os dois limiares usados,
 permitindo reproduzir e auditar o encaminhamento para revisão manual.
 
+### Interface unitária
+
+`src.classifier.classify_project` oferece uma interface estrita para consumo
+por aplicações. Ela aceita as 42 características na ordem canônica ou como um
+mapping com exatamente os nomes de `FEATURES`; campos ausentes, desconhecidos,
+índices numéricos, valores fora da escala e vetores vazios são rejeitados antes
+do cálculo.
+
+```python
+from src import ClassifierModel, classify_project
+
+model = ClassifierModel(concepts, tuple(classes), version="1.0")
+result = classify_project(
+    project_code=code,
+    features=values,
+    model=model,
+    thresholds={"minimum_similarity": 0.70, "minimum_margin": 0.30},
+)
+```
+
+O resultado contém o código, as duas primeiras classes e similaridades, margem,
+status e motivo de revisão, versão do modelo e as cinco características com
+maior contribuição absoluta para o cosseno vencedor. A aprovação humana é um
+registro separado, criado por `register_human_review`; ela preserva a decisão
+automática original e exige a identificação do revisor, inclusive para classes
+marcadas como de alto impacto no artefato do modelo.
+
 ## Análise de sensibilidade
 
 `python run_sensitivity.py` executa uma grade controlada (um fator por vez) para

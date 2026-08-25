@@ -1,12 +1,17 @@
 """Classificador conceitual por similaridade de cosseno.
 
-Todas as funções deste módulo são puras: elas não treinam pesos, não alteram as
-matrizes recebidas e não escrevem resultados em disco.
+As funções de classificação não treinam pesos, não alteram as matrizes recebidas
+e não escrevem resultados em disco. O registro humano devolve uma nova estrutura
+imutável, preservando a decisão automática.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from datetime import datetime, timezone
+from typing import Mapping
 
 import numpy as np
+
+from src.schema import FEATURES, validate_feature_values
 
 
 DECISION_CLASSIFIED = "Classificação automática"
@@ -59,6 +64,184 @@ class HistoricalPrototypeComparison:
     normalized_projects_mean: np.ndarray
     raw_projects_mean: np.ndarray
     prototype_similarity: float
+
+
+@dataclass(frozen=True)
+class ClassifierModel:
+    """Artefato versionado necessário para a classificação unitária."""
+
+    concept_matrix: object
+    class_names: tuple[str, ...]
+    version: str
+    high_impact_classes: tuple[str, ...] = ("Cat 1 - Segurança",)
+
+
+@dataclass(frozen=True)
+class FeatureContribution:
+    """Parcela de uma característica na similaridade de cosseno vencedora."""
+
+    feature: str
+    value: float
+    contribution: float
+
+
+@dataclass(frozen=True)
+class HumanReview:
+    """Registro humano; nunca é confundido com a decisão automática."""
+
+    reviewer: str
+    decision: str
+    reviewed_at: str
+    reason: str | None = None
+
+
+@dataclass(frozen=True)
+class ProjectClassification:
+    """Resposta auditável da interface de classificação unitária."""
+
+    code: str
+    predicted_class: str
+    similarity: float
+    second_class: str
+    second_similarity: float
+    margin: float
+    status: str
+    review_reason: str | None
+    model_version: str
+    contributing_features: tuple[FeatureContribution, ...]
+    high_impact: bool
+    human_review: HumanReview | None = None
+
+
+def _field(source, *names):
+    """Obtém um campo de um objeto ou mapping sem aceitar defaults implícitos."""
+    for name in names:
+        if isinstance(source, Mapping) and name in source:
+            return source[name]
+        if hasattr(source, name):
+            return getattr(source, name)
+    raise ValueError(f"campo obrigatório ausente: {names[0]}")
+
+
+def _project_features(features):
+    if isinstance(features, Mapping):
+        unknown = [name for name in features if name not in FEATURES]
+        missing = [name for name in FEATURES if name not in features]
+        if unknown:
+            raise ValueError(f"características desconhecidas: {unknown}")
+        if missing:
+            raise ValueError(f"características ausentes: {missing}")
+        values = [features[name] for name in FEATURES]
+    else:
+        if isinstance(features, (str, bytes)):
+            raise ValueError("características devem ser um vetor ou mapping")
+        try:
+            values = list(features)
+        except TypeError as error:
+            raise ValueError("características devem ser um vetor ou mapping") from error
+        if not values:
+            raise ValueError("vetor de características não pode ser vazio")
+        if len(values) != len(FEATURES):
+            raise ValueError(
+                f"devem ser informadas exatamente {len(FEATURES)} características; "
+                f"recebidas: {len(values)}"
+            )
+    vector = np.asarray(values, dtype=float)
+    validate_feature_values(vector.reshape(1, -1), "projeto")
+    return vector
+
+
+def classify_project(*, project_code, features, model, thresholds):
+    """Classifica um projeto depois de validar integralmente o contrato de entrada.
+
+    ``features`` pode ser um vetor na ordem canônica ou um mapping cujas chaves
+    sejam exatamente os 42 nomes de :data:`src.schema.FEATURES`.
+    """
+    code = str(project_code).strip()
+    if not code:
+        raise ValueError("project_code não pode ser vazio")
+    vector = _project_features(features)
+
+    concepts = np.asarray(
+        _field(model, "concept_matrix", "class_concept_matrix"), dtype=float
+    )
+    classes = tuple(_field(model, "class_names", "classes"))
+    version = str(_field(model, "version", "model_version")).strip()
+    if not version:
+        raise ValueError("versão do modelo não pode ser vazia")
+    expected_shape = (len(classes), len(FEATURES))
+    if concepts.shape != expected_shape:
+        raise ValueError(
+            f"matriz do modelo deve ter formato {expected_shape}; recebeu {concepts.shape}"
+        )
+    if len(classes) < 2 or len(set(classes)) != len(classes):
+        raise ValueError("modelo deve conter ao menos duas classes únicas")
+    validate_feature_values(concepts, "matriz do modelo")
+
+    minimum_similarity = float(_field(thresholds, "minimum_similarity"))
+    minimum_margin = float(_field(thresholds, "minimum_margin"))
+    if not np.isfinite([minimum_similarity, minimum_margin]).all():
+        raise ValueError("limiares devem ser finitos")
+
+    scores = calculate_similarities(vector.reshape(1, -1), concepts)
+    automatic = produce_decisions(
+        [code],
+        classes,
+        scores,
+        minimum_similarity=minimum_similarity,
+        minimum_margin=minimum_margin,
+    )[0]
+    review_reasons = {
+        DECISION_LOW_SIMILARITY: "similaridade abaixo do limiar mínimo",
+        DECISION_CLOSE_CLASSES: "margem entre as duas classes abaixo do limiar mínimo",
+    }
+    project_unit = normalize_vector(vector, vector_name="features")
+    concept_unit = normalize_vector(
+        concepts[automatic.class_index], vector_name="predicted_class_concept"
+    )
+    per_feature = project_unit * concept_unit
+    order = np.argsort(-np.abs(per_feature), kind="stable")
+    contributions = tuple(
+        FeatureContribution(
+            FEATURES[index], float(vector[index]), float(per_feature[index])
+        )
+        for index in order[:5]
+        if per_feature[index] != 0
+    )
+    default_high_impact = ("Cat 1 - Segurança",)
+    high_impact_classes = tuple(
+        getattr(model, "high_impact_classes", default_high_impact)
+        if not isinstance(model, Mapping)
+        else model.get("high_impact_classes", default_high_impact)
+    )
+    return ProjectClassification(
+        code=code,
+        predicted_class=automatic.closest_class,
+        similarity=automatic.similarity,
+        second_class=automatic.second_class,
+        second_similarity=automatic.second_similarity,
+        margin=automatic.margin,
+        status=automatic.status,
+        review_reason=review_reasons.get(automatic.status),
+        model_version=version,
+        contributing_features=contributions,
+        high_impact=automatic.closest_class in high_impact_classes,
+    )
+
+
+def register_human_review(result, *, reviewer, decision, reason=None, reviewed_at=None):
+    """Anexa uma revisão humana sem sobrescrever a decisão automática."""
+    if not isinstance(result, ProjectClassification):
+        raise TypeError("result deve ser um ProjectClassification")
+    reviewer = str(reviewer).strip()
+    decision = str(decision).strip()
+    if not reviewer:
+        raise ValueError("revisor é obrigatório")
+    if not decision:
+        raise ValueError("decisão humana é obrigatória")
+    timestamp = reviewed_at or datetime.now(timezone.utc).isoformat()
+    review = HumanReview(reviewer, decision, str(timestamp), reason)
+    return replace(result, human_review=review)
 
 
 def calibrate_thresholds(
