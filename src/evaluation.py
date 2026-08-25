@@ -13,6 +13,81 @@ SECURITY_LABEL = "Cat 1 - Segurança"
 MANUAL_REVIEW_LABEL = "Revisão manual"
 
 
+def compare_conceptual_historical_hebbian(
+    independent_projects,
+    true_classes,
+    class_concept_matrix,
+    class_names,
+    historical_security_projects,
+    hebbian_class_prototypes,
+    *,
+    security_class_index=0,
+    minimum_security_recall_gain=0.05,
+    minimum_security_f1_gain=0.05,
+    maximum_false_positive_increase=0,
+):
+    """Compara os três modelos no mesmo teste e decide se Hebb é mantido.
+
+    A melhora relevante é definida *antes* da inspeção do teste: ganhos mínimos
+    de recall **e** F1 de Segurança sobre o melhor dos dois baselines. Além
+    disso, o número de falsos positivos não pode crescer além do limite. Os
+    padrões (5 pontos percentuais e nenhum FP adicional) são conservadores e
+    podem ser substituídos por critérios ratificados pelos especialistas.
+
+    ``hebbian_class_prototypes`` deve ter uma linha por categoria. Desse modo,
+    o método Hebbiano participa da mesma decisão multiclasse que os baselines.
+    """
+    from .hebbian import apply_hebbian
+
+    if minimum_security_recall_gain < 0 or minimum_security_f1_gain < 0:
+        raise ValueError("ganhos mínimos devem ser não negativos")
+    if maximum_false_positive_increase < 0:
+        raise ValueError("maximum_false_positive_increase deve ser não negativo")
+
+    paired = evaluate_historical_prototype(
+        independent_projects,
+        true_classes,
+        class_concept_matrix,
+        class_names,
+        historical_security_projects,
+        security_class_index=security_class_index,
+    )
+    classes = list(class_names)
+    hebbian_scores = apply_hebbian(independent_projects, hebbian_class_prototypes)
+    if hebbian_scores.shape[1] != len(classes):
+        raise ValueError("hebbian_class_prototypes deve ter uma linha por classe")
+    hebbian_predictions = [classes[index] for index in hebbian_scores.argmax(axis=1)]
+    hebbian = evaluate(true_classes, hebbian_predictions, classes)
+
+    baselines = [paired["conceptual"], paired["historical_security"]]
+    baseline_recall = max(item["security"]["recall"] for item in baselines)
+    baseline_f1 = max(item["security"]["f1"] for item in baselines)
+    baseline_fp = min(item["security"]["false_positives"] for item in baselines)
+    security = hebbian["security"]
+    recall_gain = security["recall"] - baseline_recall
+    f1_gain = security["f1"] - baseline_f1
+    fp_increase = security["false_positives"] - baseline_fp
+    retained = (
+        recall_gain >= minimum_security_recall_gain
+        and f1_gain >= minimum_security_f1_gain
+        and fp_increase <= maximum_false_positive_increase
+    )
+    return {
+        **paired,
+        "hebbian": hebbian,
+        "hebbian_scores": hebbian_scores,
+        "retention": {
+            "retain_hebbian": bool(retained),
+            "security_recall_gain": float(recall_gain),
+            "security_f1_gain": float(f1_gain),
+            "false_positive_increase": int(fp_increase),
+            "minimum_security_recall_gain": float(minimum_security_recall_gain),
+            "minimum_security_f1_gain": float(minimum_security_f1_gain),
+            "maximum_false_positive_increase": int(maximum_false_positive_increase),
+        },
+    }
+
+
 def evaluate_historical_prototype(
     independent_projects,
     true_classes,
