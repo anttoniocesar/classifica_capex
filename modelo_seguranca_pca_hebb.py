@@ -342,7 +342,7 @@ C_EXTRA = np.array([
 
 C = np.hstack([C32, C_EXTRA])
 
-assert C.shape == (13, 42)
+assert C.shape == (len(CLASSES), len(FEATURES))
 
 def normalize_rows(matrix):
     norms = np.linalg.norm(
@@ -471,7 +471,7 @@ def main():
     V = np.zeros(
         (
             len(VALIDATION_CODES),
-            42
+            len(FEATURES)
         ),
         dtype=float
     )
@@ -659,7 +659,7 @@ def main():
         "RS-TR0143",
     ]
 
-    P = np.zeros((19, 42), dtype=float)
+    P = np.zeros((len(PROJECT_CODES), len(FEATURES)), dtype=float)
 
 
     def set_values(row, values):

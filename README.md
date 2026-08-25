@@ -21,3 +21,17 @@ A matriz conceitual atual tem a versão `1.0`. Ao executar o modelo, o diretóri
 Os dois projetos de validação atualmente codificados pertencem a Segurança.
 Seus resultados servem somente como diagnóstico e **não** como evidência de
 qualidade ou acurácia do modelo.
+
+## Dados de entrada
+
+A matriz conceitual é mantida em `data/concept_matrix.csv`, com uma linha por
+classe e as 42 características canônicas. Os projetos ficam separados em
+`data/projects_train.csv`, `data/projects_validation.csv` e
+`data/projects_test.csv`; cada registro inclui classe real e a proveniência da
+codificação e da validação do rótulo.
+
+Use `src.data.load_concept_matrices()` e `src.data.load_project_partitions()`
+para carregar os arquivos. Os carregadores rejeitam esquemas diferentes de 42
+características, códigos repetidos (inclusive entre partições), classes
+desconhecidas, campos de proveniência vazios, valores não numéricos, infinitos,
+fora da escala de 0 a 1 ou vetores inteiramente zerados.
