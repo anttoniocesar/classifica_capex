@@ -52,6 +52,15 @@ class Classification:
         return self.status != DECISION_CLASSIFIED
 
 
+@dataclass(frozen=True)
+class HistoricalPrototypeComparison:
+    """Duas definições auditáveis do centro do corpus histórico."""
+
+    normalized_projects_mean: np.ndarray
+    raw_projects_mean: np.ndarray
+    prototype_similarity: float
+
+
 def calibrate_thresholds(
     similarity_matrix,
     true_classes,
@@ -132,6 +141,87 @@ def normalize_rows(matrix, *, matrix_name="matrix"):
     if zero_rows:
         raise ValueError(f"{matrix_name} contains zero-norm vectors at rows {zero_rows}")
     return values / norms
+
+
+def normalize_vector(vector, *, vector_name="vector"):
+    """Normaliza um vetor unidimensional e rejeita entradas degeneradas."""
+    value = np.asarray(vector, dtype=float)
+    if value.ndim != 1:
+        raise ValueError(f"{vector_name} must be a one-dimensional vector")
+    if not np.isfinite(value).all():
+        raise ValueError(f"{vector_name} contains non-finite values")
+    norm = np.linalg.norm(value)
+    if norm == 0:
+        raise ValueError(f"{vector_name} has zero norm")
+    return value / norm
+
+
+def historical_prototype(projects):
+    """Calcula o centro direcional dando o mesmo peso a cada projeto.
+
+    Cada projeto é normalizado antes da média. Assim, a magnitude do vetor
+    bruto não aumenta artificialmente a contribuição de um projeto ao centro.
+    """
+    normalized_projects = normalize_rows(projects, matrix_name="historical_projects")
+    if not len(normalized_projects):
+        raise ValueError("historical_projects must not be empty")
+    return normalize_vector(
+        normalized_projects.mean(axis=0), vector_name="historical_prototype"
+    )
+
+
+def compare_historical_prototypes(projects):
+    """Compara o centro direcional com a normalização da média bruta."""
+    values = np.asarray(projects, dtype=float)
+    directional = historical_prototype(values)
+    # ``historical_prototype`` já faz toda a validação, inclusive matriz vazia.
+    raw_mean = normalize_vector(values.mean(axis=0), vector_name="raw_mean_prototype")
+    return HistoricalPrototypeComparison(
+        normalized_projects_mean=directional,
+        raw_projects_mean=raw_mean,
+        prototype_similarity=float(directional @ raw_mean),
+    )
+
+
+def historical_security_concept_matrix(
+    class_concept_matrix,
+    historical_security_projects,
+    *,
+    security_class_index=0,
+):
+    """Mantém 12 conceitos e troca somente Segurança pelo centro histórico.
+
+    A função constrói uma matriz nova; portanto não promove o protótipo a uma
+    regra de decisão para qualquer uma das demais categorias.
+    """
+    concepts = np.asarray(class_concept_matrix, dtype=float)
+    normalized_concepts = normalize_rows(concepts, matrix_name="class_concept_matrix")
+    if not 0 <= security_class_index < len(normalized_concepts):
+        raise ValueError("security_class_index is outside class_concept_matrix")
+    prototype = historical_prototype(historical_security_projects)
+    if prototype.shape[0] != normalized_concepts.shape[1]:
+        raise ValueError(
+            "historical projects and class concepts must have the same number of columns"
+        )
+    result = normalized_concepts.copy()
+    result[security_class_index] = prototype
+    return result
+
+
+def calculate_historical_security_similarities(
+    project_feature_matrix,
+    class_concept_matrix,
+    historical_security_projects,
+    *,
+    security_class_index=0,
+):
+    """Calcula scores novos contra H em Segurança e conceitos nas outras classes."""
+    hybrid_concepts = historical_security_concept_matrix(
+        class_concept_matrix,
+        historical_security_projects,
+        security_class_index=security_class_index,
+    )
+    return calculate_similarities(project_feature_matrix, hybrid_concepts)
 
 
 def calculate_similarities(project_feature_matrix, class_concept_matrix):

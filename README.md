@@ -24,6 +24,22 @@ precisão-alvo; ela falha explicitamente se receber apenas os 19 projetos de
 Segurança. Cada decisão e cada linha exportada registra os dois limiares usados,
 permitindo reproduzir e auditar o encaminhamento para revisão manual.
 
+## Protótipo histórico de Segurança
+
+O protótipo histórico direcional normaliza cada projeto antes de calcular o
+centro e normaliza novamente a média resultante. Isso evita que projetos com
+maior norma tenham peso adicional. `compare_historical_prototypes` também
+expõe, para auditoria, a alternativa anterior (normalizar somente a média dos
+vetores brutos) e o cosseno entre os dois centros.
+
+`calculate_historical_security_similarities` usa esse centro exclusivamente na
+linha de **Cat 1 - Segurança**; as referências conceituais das outras 12 classes
+são preservadas. `evaluate_historical_prototype` compara essa abordagem com o
+baseline conceitual no mesmo conjunto independente, sem ajustar limiares nele.
+Como `data/projects_test.csv` ainda não possui casos, nenhuma métrica empírica do
+protótipo é alegada por enquanto; a avaliação deve ser executada quando a
+partição de teste sob custódia for preenchida.
+
 ## Baseline exploratória versionada (legada)
 
 A matriz conceitual atual tem a versão `1.0`. O fluxo exploratório legado gera,

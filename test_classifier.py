@@ -8,8 +8,12 @@ from src.classifier import (
     calibrate_thresholds,
     calculate_margins,
     calculate_similarities,
+    calculate_historical_security_similarities,
     classify,
+    compare_historical_prototypes,
     get_first_and_second_classes,
+    historical_prototype,
+    historical_security_concept_matrix,
     normalize_rows,
 )
 
@@ -71,3 +75,33 @@ def test_funcoes_intermediarias_sao_independentes():
 def test_normalizacao_rejeita_vetor_de_norma_zero(argument):
     with pytest.raises(ValueError, match="zero-norm"):
         normalize_rows(argument, matrix_name="project_feature_matrix")
+
+
+def test_prototipo_historico_normaliza_cada_projeto_antes_da_media():
+    projects = np.array([[10.0, 0.0], [0.0, 1.0]])
+
+    prototype = historical_prototype(projects)
+    comparison = compare_historical_prototypes(projects)
+
+    np.testing.assert_allclose(prototype, [2 ** -0.5, 2 ** -0.5])
+    np.testing.assert_allclose(comparison.normalized_projects_mean, prototype)
+    np.testing.assert_allclose(
+        comparison.raw_projects_mean, np.array([10.0, 1.0]) / np.sqrt(101)
+    )
+    assert comparison.prototype_similarity < 1.0
+
+
+def test_prototipo_substitui_somente_referencia_de_seguranca():
+    concepts = np.eye(3)
+    historical_security = np.array([[1.0, 1.0, 0.0]])
+
+    hybrid = historical_security_concept_matrix(
+        concepts, historical_security, security_class_index=1
+    )
+    scores = calculate_historical_security_similarities(
+        [[1.0, 1.0, 0.0]], concepts, historical_security, security_class_index=1
+    )
+
+    np.testing.assert_allclose(hybrid[[0, 2]], concepts[[0, 2]])
+    np.testing.assert_allclose(hybrid[1], [2 ** -0.5, 2 ** -0.5, 0.0])
+    np.testing.assert_allclose(scores, [[2 ** -0.5, 1.0, 0.0]])
