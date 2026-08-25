@@ -2,14 +2,10 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-
-from matplotlib.widgets import CheckButtons
-from sklearn.decomposition import PCA
-from scipy.stats import chi2
 
 from baseline_modelo import save_baseline
 from src.hebbian import historical_prototype, train_hebbian
+from src.visualization import project_pca, save_pca_plot
 
 # ============================================================
 # 2. FUNÇÕES AUXILIARES
@@ -17,109 +13,6 @@ from src.hebbian import historical_prototype, train_hebbian
 
 # Se você já possui funções aqui, mantenha-as.
 
-
-def plot_confidence_ellipsoid_3d(
-    ax,
-    points,
-    confidence=0.95,
-    color="yellow",
-    alpha=0.18,
-    edgecolor="goldenrod"
-):
-    """
-    Cria uma elipsoide 3D baseada na média
-    e covariância dos pontos.
-    """
-
-    points = np.asarray(points)
-
-    # Centro da nuvem
-    center = points.mean(axis=0)
-
-    # Matriz de covariância
-    cov = np.cov(
-        points,
-        rowvar=False
-    )
-
-    # Regularização numérica
-    cov = cov + np.eye(3) * 1e-8
-
-    # Autovalores e autovetores
-    eigenvalues, eigenvectors = np.linalg.eigh(cov)
-
-    # Ordenar do maior para o menor
-    order = eigenvalues.argsort()[::-1]
-
-    eigenvalues = eigenvalues[order]
-    eigenvectors = eigenvectors[:, order]
-
-    # Escala da região
-    scale = np.sqrt(
-        chi2.ppf(
-            confidence,
-            df=3
-        )
-    )
-
-    # Raios
-    radii = scale * np.sqrt(eigenvalues)
-
-    # Malha esférica
-    u = np.linspace(0, 2 * np.pi, 60)
-    v = np.linspace(0, np.pi, 40)
-
-    x = np.outer(
-        np.cos(u),
-        np.sin(v)
-    )
-
-    y = np.outer(
-        np.sin(u),
-        np.sin(v)
-    )
-
-    z = np.outer(
-        np.ones_like(u),
-        np.cos(v)
-    )
-
-    sphere = np.stack(
-        [x, y, z],
-        axis=-1
-    )
-
-    # Transformar esfera em elipsoide
-    ellipsoid = sphere * radii
-
-    # Rotacionar
-    ellipsoid = ellipsoid @ eigenvectors.T
-
-    # Deslocar para o centro
-    ellipsoid += center
-
-    # Superfície
-    ax.plot_surface(
-        ellipsoid[:, :, 0],
-        ellipsoid[:, :, 1],
-        ellipsoid[:, :, 2],
-        color=color,
-        alpha=alpha,
-        linewidth=0,
-        shade=True
-    )
-
-    # Linhas da superfície
-    ax.plot_wireframe(
-        ellipsoid[:, :, 0],
-        ellipsoid[:, :, 1],
-        ellipsoid[:, :, 2],
-        color=edgecolor,
-        linewidth=0.3,
-        alpha=0.20
-    )
-
-    return center, radii
 
 # ============================================================
 # CONFIGURAÇÕES
@@ -1010,115 +903,23 @@ def main():
 
 
     # ============================================================
-    # 12. PCA CORRIGIDO — ESPAÇO NORMALIZADO
+    # 12–14. PCA E GRÁFICO EXCLUSIVAMENTE EXPLORATÓRIOS
     # ============================================================
-    #
-    # IMPORTANTE:
-    # A classificação usa similaridade de cosseno.
-    # Portanto, o que importa é a DIREÇÃO dos vetores,
-    # e não sua magnitude.
-    #
-    # Para que o PCA represente a mesma lógica geométrica,
-    # normalizamos:
-    #
-    #   - 13 conceitos
-    #   - 19 projetos
-    #   - centro histórico
-    #   - protótipo Hebbiano
-    #
-    # antes da projeção.
-    # ============================================================
+    # A classificação e os rankings acima foram calculados no espaço
+    # normalizado completo das 42 características. PCA e região de dispersão
+    # não participam de nenhuma decisão.
+    projection = project_pca(C, P, H.reshape(1, -1), W.reshape(1, -1))
+    C_pca = projection.concepts
+    P_pca, H_projected, W_projected = projection.collections
+    H_pca = H_projected[0]
+    W_pca = W_projected[0]
+    variance = projection.explained_variance_percent
 
-
-    # ------------------------------------------------------------
-    # 12.1 Normalização
-    # ------------------------------------------------------------
-
-    C_pca_input = normalize_rows(C)
-    P_pca_input = normalize_rows(P)
-
-    H_pca_input = normalize_vector(H)
-
-    # W já foi normalizado durante o treinamento,
-    # mas normalizamos novamente por segurança.
-    W_pca_input = normalize_vector(W)
-
-
-    # ------------------------------------------------------------
-    # 12.2 Ajustar PCA SOMENTE nos 13 conceitos normalizados
-    # ------------------------------------------------------------
-
-    pca = PCA(n_components=3)
-
-    C_pca = pca.fit_transform(
-        C_pca_input
-    )
-
-
-    # ------------------------------------------------------------
-    # 12.3 Projetar os projetos no MESMO espaço PCA
-    # ------------------------------------------------------------
-
-    P_pca = pca.transform(
-        P_pca_input
-    )
-
-
-    # ------------------------------------------------------------
-    # 12.4 Projetar o centro histórico normalizado
-    # ------------------------------------------------------------
-
-    H_pca = pca.transform(
-        H_pca_input.reshape(1, -1)
-    )[0]
-
-
-    # ------------------------------------------------------------
-    # 12.5 Projetar o protótipo Hebbiano
-    # ------------------------------------------------------------
-
-    W_pca = pca.transform(
-        W_pca_input.reshape(1, -1)
-    )[0]
-
-
-    # ------------------------------------------------------------
-    # 12.6 Variância explicada
-    # ------------------------------------------------------------
-
-    variance = (
-        pca.explained_variance_ratio_
-        * 100
-    )
-
-
-    print("\n" + "=" * 70)
-    print("PCA CORRIGIDO — VETORES NORMALIZADOS")
-    print("=" * 70)
-
-    print(
-        f"\nPC1 = {variance[0]:.4f}%"
-    )
-
-    print(
-        f"PC2 = {variance[1]:.4f}%"
-    )
-
-    print(
-        f"PC3 = {variance[2]:.4f}%"
-    )
-
-    print(
-        f"TOTAL = {variance.sum():.4f}%"
-    )
-
-    print(
-        "\nH_pca normalizado:"
-    )
-
-    print(
-        np.round(H_pca, 4)
-    )
+    print("\nPCA EXPLORATÓRIO — PROJEÇÃO COM REDUÇÃO DE INFORMAÇÃO")
+    print(f"PC1 = {variance[0]:.4f}%")
+    print(f"PC2 = {variance[1]:.4f}%")
+    print(f"PC3 = {variance[2]:.4f}%")
+    print(f"TOTAL = {variance.sum():.4f}%")
 
     baseline_metadata_path, baseline_arrays_path = save_baseline(
         OUTPUT_DIR,
@@ -1127,10 +928,7 @@ def main():
         classes=CLASSES,
         project_codes=PROJECT_CODES,
         validation_codes=VALIDATION_CODES,
-        c32=C32,
-        c_extra=C_EXTRA,
-        projects=P,
-        validation_projects=V,
+        c32=C32, c_extra=C_EXTRA, projects=P, validation_projects=V,
         project_similarities=similarities,
         validation_similarities=validation_similarities,
         conceptual_security_weights=C_security,
@@ -1139,349 +937,21 @@ def main():
         pca_explained_variance=variance,
     )
 
-    print(
-        "\nW_pca normalizado:"
-    )
-
-    print(
-        np.round(W_pca, 4)
-    )
-
-
-    # ============================================================
-    # 13. TABELAS DE COORDENADAS PCA
-    # ============================================================
-
-    classes_pca_df = pd.DataFrame(
-        C_pca,
-        index=CLASSES,
-        columns=["PC1", "PC2", "PC3"]
-    )
-
-    projects_pca_df = pd.DataFrame(
-        P_pca,
-        index=PROJECT_CODES,
-        columns=["PC1", "PC2", "PC3"]
-    )
-
+    classes_pca_df = pd.DataFrame(C_pca, index=CLASSES, columns=["PC1", "PC2", "PC3"])
+    projects_pca_df = pd.DataFrame(P_pca, index=PROJECT_CODES, columns=["PC1", "PC2", "PC3"])
     summary_pca_df = pd.DataFrame({
-        "Objeto": [
-            "Centro histórico Segurança",
-            "Protótipo Hebbiano Segurança"
-        ],
-        "PC1": [
-            H_pca[0],
-            W_pca[0]
-        ],
-        "PC2": [
-            H_pca[1],
-            W_pca[1]
-        ],
-        "PC3": [
-            H_pca[2],
-            W_pca[2]
-        ]
+        "Objeto": ["Centro histórico Segurança", "Protótipo Hebbiano Segurança"],
+        "PC1": [H_pca[0], W_pca[0]], "PC2": [H_pca[1], W_pca[1]],
+        "PC3": [H_pca[2], W_pca[2]],
     })
 
-
-    # ============================================================
-    # 14. GRÁFICO 3D
-    # ============================================================
-
-    fig = plt.figure(
-        figsize=(18, 12)
+    graph_path = OUTPUT_DIR / "pca_3d_seguranca_atualizado.png"
+    save_pca_plot(
+        graph_path, C, P, CLASSES,
+        data_version=", ".join(f"{key}={value}" for key, value in MATRIX_VERSIONS.items()),
+        model_version=concept_matrix_version,
+        project_label=f"{len(P)} projetos reais de Segurança",
     )
-
-    ax = fig.add_subplot(
-        111,
-        projection="3d"
-    )
-
-    colors = plt.cm.tab20(
-        np.linspace(0, 1, len(CLASSES))
-    )
-
-    # ============================================================
-    # CLASSE DE REFERÊNCIA PARA AS SIMILARIDADES NO GRÁFICO
-    # ============================================================
-
-    # Cat 1 - Segurança é a posição 0 da matriz
-    security_index = 0
-
-    # Similaridade de cosseno de Segurança com todas as classes
-    security_similarities = (
-        concept_similarity[security_index]
-    )
-
-    # Distância de cosseno:
-    # distância = 1 - similaridade
-    security_distances = (
-        concept_cosine_distance[security_index]
-    )
-
-    # ============================================================
-    # CLASSES CONCEITUAIS
-    # ============================================================
-
-    for i, class_name in enumerate(CLASSES):
-
-        x, y, z = C_pca[i]
-
-        # Desenha a estrela da classe
-        ax.scatter(
-            x,
-            y,
-            z,
-            s=180,
-            marker="*",
-            color=colors[i],
-            edgecolor="black",
-            linewidth=0.8,
-            alpha=0.95
-        )
-
-        # --------------------------------------------------------
-        # Texto mostrado ao lado da estrela
-        # --------------------------------------------------------
-
-        if i == security_index:
-
-            # A própria Segurança é nossa referência
-            label = (
-                f"  {class_name}\n"
-                f"  Referência"
-            )
-
-        else:
-
-            # Demais classes:
-            # mostra similaridade e distância em relação à Segurança
-            label = (
-                f"  {class_name}\n"
-                f"  Sim={security_similarities[i]:.2f}"
-            )
-
-        ax.text(
-            x,
-            y,
-            z,
-            label,
-            fontsize=8
-        )
-
-
-    # ============================================================
-    # PROJETOS REAIS DE SEGURANÇA
-    # ============================================================
-
-    scatter_projects = ax.scatter(
-        P_pca[:, 0],
-        P_pca[:, 1],
-        P_pca[:, 2],
-        s=70,
-        color="#1565C0",
-        alpha=0.72,
-        edgecolor="white",
-        linewidth=0.5,
-        label="19 projetos reais de Segurança"
-    )
-
-    # ============================================================
-    # REGIÃO DE DISPERSÃO DOS PROJETOS DE SEGURANÇA
-    # ============================================================
-
-    ellipsoid_center, ellipsoid_radii = (
-        plot_confidence_ellipsoid_3d(
-            ax,
-            P_pca,
-            confidence=0.95,
-            color="yellow",
-            alpha=0.18
-        )
-    )
-
-    # ============================================================
-    # CENTRO HISTÓRICO
-    # ============================================================
-
-    scatter_history = ax.scatter(
-        H_pca[0],
-        H_pca[1],
-        H_pca[2],
-        color="black",
-        marker="o",
-        s=220,
-        edgecolor="white",
-        linewidth=1.5,
-        label="Centro histórico Segurança"
-    )
-
-
-    # ============================================================
-    # PROTÓTIPO HEBBIANO
-    # ============================================================
-
-    scatter_hebb = ax.scatter(
-        W_pca[0],
-        W_pca[1],
-        W_pca[2],
-        color="red",
-        marker="X",
-        s=260,
-        edgecolor="black",
-        linewidth=1.0,
-        label="Protótipo Hebbiano Segurança"
-    )
-
-
-    # Vetor conceito -> Hebb
-    security_coord = C_pca[0]
-
-    ax.plot(
-        [
-            security_coord[0],
-            W_pca[0]
-        ],
-        [
-            security_coord[1],
-            W_pca[1]
-        ],
-        [
-            security_coord[2],
-            W_pca[2]
-        ],
-        color="red",
-        linestyle="--",
-        linewidth=2.5,
-        alpha=0.9
-    )
-
-
-    # Vetor conceito -> histórico
-    ax.plot(
-        [
-            security_coord[0],
-            H_pca[0]
-        ],
-        [
-            security_coord[1],
-            H_pca[1]
-        ],
-        [
-            security_coord[2],
-            H_pca[2]
-        ],
-        color="black",
-        linestyle=":",
-        linewidth=2.0,
-        alpha=0.7
-    )
-
-
-    ax.set_title(
-        "PCA 3D — 13 Classes Conceituais + 19 Projetos Reais de Segurança",
-        fontsize=18,
-        fontweight="bold",
-        pad=24
-    )
-
-    ax.set_xlabel(
-        f"PC1 ({variance[0]:.2f}%)",
-        fontsize=11
-    )
-
-    ax.set_ylabel(
-        f"PC2 ({variance[1]:.2f}%)",
-        fontsize=11
-    )
-
-    ax.set_zlabel(
-        f"PC3 ({variance[2]:.2f}%)",
-        fontsize=11
-    )
-
-    ax.view_init(
-        elev=24,
-        azim=-58
-    )
-
-    ax.grid(
-        True,
-        alpha=0.25
-    )
-
-    ax.legend(
-        loc="upper left",
-        bbox_to_anchor=(1.02, 1)
-    )
-
-    plt.tight_layout()
-
-    graph_path = (
-        OUTPUT_DIR /
-        "pca_3d_seguranca_atualizado.png"
-    )
-
-    plt.savefig(
-        graph_path,
-        dpi=220,
-        bbox_inches="tight"
-    )
-
-    # ============================================================
-    # CONTROLE INTERATIVO — PROJETOS REAIS
-    # ============================================================
-
-    ax_check = plt.axes([
-        0.79,   # posição horizontal
-        0.75,   # posição vertical
-        0.19,   # largura
-        0.15    # altura
-    ])
-
-    check_elements = CheckButtons(
-        ax_check,
-        [
-            "Projetos reais",
-            "Centro histórico",
-            "Protótipo Hebbiano"
-        ],
-        [
-            True,
-            True,
-            True
-        ]
-    )
-
-
-    def toggle_elements(label):
-
-        if label == "Projetos reais":
-
-            scatter_projects.set_visible(
-                not scatter_projects.get_visible()
-            )
-
-        elif label == "Centro histórico":
-
-            scatter_history.set_visible(
-                not scatter_history.get_visible()
-            )
-        elif label == "Protótipo Hebbiano":
-
-            scatter_hebb.set_visible(
-                not scatter_hebb.get_visible()
-            )
-
-        fig.canvas.draw_idle()
-
-
-    check_elements.on_clicked(
-        toggle_elements
-    )
-
-    plt.show()
-
 
     # ============================================================
     # 15. EXPORTAR EXCEL
