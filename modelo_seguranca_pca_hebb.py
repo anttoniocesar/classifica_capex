@@ -336,6 +336,308 @@ C = np.hstack([C32, C_EXTRA])
 
 assert C.shape == (13, 42)
 
+def normalize_rows(matrix):
+    norms = np.linalg.norm(
+        matrix,
+        axis=1,
+        keepdims=True
+    )
+
+    return np.divide(
+        matrix,
+        norms,
+        out=np.zeros_like(matrix),
+        where=norms != 0
+    )
+
+# ============================================================
+# FASE 1 — VALIDAÇÃO CONCEITUAL
+# ============================================================
+#
+# Projetos novos usados exclusivamente para testar
+# os 13 conceitos.
+#
+# IMPORTANTE:
+# Estes projetos NÃO participam do treinamento Hebbiano.
+# ============================================================
+
+VALIDATION_CODES = [
+
+    # CAT 1 — SEGURANÇA
+    "UJ-EU0117",
+    "RS-LA0083",
+    #"UJ-MS0049",
+    #"UP-MS0030",
+    #"FT-TT0181",
+
+    # CAT 2 — CRESCIMENTO
+    #"BM-LA0086",
+    #"MS-GR0099",
+
+    # CAT 3 — MODIFICAÇÕES
+    #"FT-SP0006",
+    #"FT-SP0005",
+    #"RS-TR0150",
+    #"BM-GT0011",
+    #"UP-AC0248",
+
+    # CAT 4 — MANUTENÇÃO
+    #"US-SA0019",
+    #"RP-RP0001",
+    #"RS-LA0078",
+    #"FT-SP0007",
+    #"UJ-AF0118",
+
+    # CAT 5 — RENOVAÇÕES
+    #"UJ-AF0019",
+
+    # CAT 6 — MEIO AMBIENTE
+    #"BM-MA0010",
+    #"US-SA0002",
+    #"ME-CT0019",
+    #"UJ-MA0039",
+    #"UJ-TR0262",
+
+    # CAT 7 — TI
+    #"CD-TI0114",
+    #"CD-TI0115",
+    #"UP-TI0051",
+    #"CD-TI0126",
+    #"FT-TI0034",
+
+    # CAT 8 — P&D
+    #"FT-SP0002",
+]
+
+
+print("\nProjetos de validação:")
+print(len(VALIDATION_CODES))
+
+VALIDATION_REAL_CLASSES = [
+    "Cat 1 - Segurança",
+    "Cat 1 - Segurança",
+    #"Cat 1 - Segurança",
+    #"Cat 1 - Segurança",
+    #"Cat 1 - Segurança",
+
+    #"Cat 2 - Crescimento",
+    #"Cat 2 - Crescimento",
+
+    #"Cat 3 - Modificações",
+    #"Cat 3 - Modificações",
+    #"Cat 3 - Modificações",
+    #"Cat 3 - Modificações",
+    #"Cat 3 - Modificações",
+
+    #"Cat 4 - Manutenção",
+    #"Cat 4 - Manutenção",
+    #"Cat 4 - Manutenção",
+    #"Cat 4 - Manutenção",
+    #"Cat 4 - Manutenção",
+
+    #"Cat 5 - Renovações",
+
+    #"Cat 6 - Meio ambiente",
+    #"Cat 6 - Meio ambiente",
+    #"Cat 6 - Meio ambiente",
+    #"Cat 6 - Meio ambiente",
+    #"Cat 6 - Meio ambiente",
+
+    #"Cat 7 - TI",
+    #"Cat 7 - TI",
+    #"Cat 7 - TI",
+    #"Cat 7 - TI",
+    #"Cat 7 - TI",
+
+    #"Cat 8 - P&D",
+]
+
+assert len(VALIDATION_CODES) == len(VALIDATION_REAL_CLASSES)
+
+# ============================================================
+# MATRIZ DOS PROJETOS DE VALIDAÇÃO
+# ============================================================
+
+V = np.zeros(
+    (
+        len(VALIDATION_CODES),
+        42
+    ),
+    dtype=float
+)
+
+
+def set_validation_values(row, values):
+    """
+    Preenche as características X01...X42
+    de um projeto da base de validação.
+    """
+
+    for feature_number, value in values.items():
+
+        V[
+            row,
+            feature_number - 1
+        ] = value
+
+
+# ============================================================
+# PASSO 4 — CODIFICAR OS NOVOS PROJETOS
+# ============================================================
+
+# Projeto 0 — UJ-EU0117 — AVCB
+set_validation_values(
+    0,
+    {
+        1: 0.50,
+        2: 1.00,
+        3: 1.00,
+        4: 1.00,
+        13: 0.50,
+        28: 0.50,
+        33: 1.00,
+        34: 0.75,
+        36: 1.00,
+        38: 0.75,
+        39: 0.75,
+        40: 0.75
+    }
+)
+
+
+# Projeto 1 — RS-LA0083 — NR12
+set_validation_values(
+    1,
+    {
+        1: 1.00,
+        2: 0.75,
+        3: 1.00,
+        4: 1.00,
+        13: 0.50,
+        28: 0.75,
+        33: 1.00,
+        34: 1.00,
+        35: 1.00,
+        38: 1.00,
+        39: 1.00,
+        40: 0.50,
+        41: 0.75
+    }
+)
+
+print("\nVALIDAÇÃO DA MATRIZ V")
+print("Formato da matriz V:", V.shape)
+
+empty_validation_rows = np.where(
+    np.linalg.norm(V, axis=1) == 0
+)[0]
+
+print(
+    "Projetos ainda não codificados:",
+    empty_validation_rows
+) 
+
+if len(empty_validation_rows) > 0:
+    raise ValueError(
+        f"Existem projetos de validação ainda não codificados: "
+        f"{empty_validation_rows}"
+    )
+
+# ============================================================
+# PASSO 5 — SIMILARIDADE CONCEITUAL
+# ============================================================
+
+V_norm = normalize_rows(V)
+
+C_validation_norm = normalize_rows(C)
+
+validation_similarities = V_norm @ C_validation_norm.T
+
+# ============================================================
+# PASSO 6 — ENCONTRAR PRIMEIRA E SEGUNDA CLASSES
+# ============================================================
+
+validation_ranking = np.argsort(
+    validation_similarities,
+    axis=1
+)[:, ::-1]
+
+validation_winner_index = (
+    validation_ranking[:, 0]
+)
+
+validation_second_index = (
+    validation_ranking[:, 1]
+)
+
+validation_winner_score = (
+    validation_similarities[
+        np.arange(len(V)),
+        validation_winner_index
+    ]
+)
+
+validation_second_score = (
+    validation_similarities[
+        np.arange(len(V)),
+        validation_second_index
+    ]
+)
+
+# ============================================================
+# PASSO 7 — CALCULAR A MARGEM ENTRE A 1ª E A 2ª CLASSE
+# ============================================================
+
+validation_margin = (
+    validation_winner_score
+    -
+    validation_second_score
+)
+
+# ============================================================
+# PASSO 8 — DESCOBRIR SE A CLASSIFICAÇÃO ACERTOU
+# ============================================================
+
+# Converte o índice da classe vencedora
+# para o nome da classe
+validation_predicted_classes = [
+    CLASSES[i]
+    for i in validation_winner_index
+]
+
+
+# Compara a classe prevista com a classe real
+validation_correct = [
+    predicted == real
+    for predicted, real in zip(
+        validation_predicted_classes,
+        VALIDATION_REAL_CLASSES
+    )
+]
+
+# ============================================================
+# VERIFICAÇÃO DO PASSO 8
+# ============================================================
+
+print("\n" + "=" * 70)
+print("PASSO 8 — VERIFICAÇÃO DAS CLASSIFICAÇÕES")
+print("=" * 70)
+
+for code, real, predicted, correct in zip(
+    VALIDATION_CODES,
+    VALIDATION_REAL_CLASSES,
+    validation_predicted_classes,
+    validation_correct
+):
+
+    resultado = "ACERTOU" if correct else "ERROU"
+
+    print(
+        f"{code:15s} | "
+        f"Real: {real:25s} | "
+        f"Prevista: {predicted:25s} | "
+        f"{resultado}"
+    )
 
 # ============================================================
 # 5. PROJETOS REAIS DE SEGURANÇA
@@ -518,21 +820,6 @@ def normalize_vector(vector):
         return vector.copy()
 
     return vector / norm
-
-
-def normalize_rows(matrix):
-    norms = np.linalg.norm(
-        matrix,
-        axis=1,
-        keepdims=True
-    )
-
-    return np.divide(
-        matrix,
-        norms,
-        out=np.zeros_like(matrix),
-        where=norms != 0
-    )
 
 
 def interpretar_similaridade(sim):
