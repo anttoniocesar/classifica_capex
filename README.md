@@ -6,6 +6,7 @@ CAPEX e seus resultados.
 ## Documentação de negócio
 
 - [Definição do problema, custos de erro e métricas](docs/definicao_problema_metricas.md)
+- [Esquema operacional das características X01–X42](docs/esquema_caracteristicas_X01_X42.json) — inclui escala, evidências, fronteiras entre conceitos, tratamento de informação desconhecida, revisão especializada e histórico de versões
 
 ## Baseline versionada
 

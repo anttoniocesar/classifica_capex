@@ -1,0 +1,1132 @@
+{
+  "documento": "Dicionário operacional de características CAPEX X01–X42",
+  "versao": "1.0.0",
+  "data_versao": "2026-08-25",
+  "status": "proposto; uso produtivo condicionado à revisão especializada das matrizes",
+  "politica_ausencia_desconhecido": {
+    "ausencia": "Somente o nível numérico 0: há evidência bastante para concluir que a característica não ocorre.",
+    "desconhecido": "Somente o marcador textual UNKNOWN: a evidência é insuficiente ou conflitante.",
+    "restricao": "0 e UNKNOWN são estados semanticamente distintos. UNKNOWN deve ser armazenado como nulo categorizado/máscara e não pode ser imputado automaticamente como 0."
+  },
+  "unidade_codificacao": "Uma característica por projeto e por versão de codificação; evidências e identidade do validador devem ser auditáveis.",
+  "revisao_sobreposicoes": [
+    {
+      "caracteristicas": [
+        "X01",
+        "X02",
+        "X04",
+        "X38"
+      ],
+      "decisao": "X01 é o domínio ocupacional; X02 é cenário acidental de processo; X04 exige risco formal registrado e tratamento; X38 descreve exposição humana direta existente. Podem coexistir, mas nenhuma implica automaticamente outra.",
+      "teste_de_fronteira": "Classificar separadamente domínio, registro formal e existência de pessoa exposta; exigir evidência própria para cada código."
+    },
+    {
+      "caracteristicas": [
+        "X03",
+        "X33"
+      ],
+      "decisao": "X03 requer obrigação jurídica direta; X33 cobre norma técnica, código ou padrão. Uma norma só recebe também X03 quando incorporada por lei, licença ou ato vinculante, com prova.",
+      "teste_de_fronteira": "Registrar a fonte da obrigação e evitar dupla marcação baseada no mesmo documento sem análise de incorporação."
+    },
+    {
+      "caracteristicas": [
+        "X34",
+        "X38"
+      ],
+      "decisao": "X34 descreve uma solução/barreira de proteção de pessoas; X38 descreve a exposição atual. Proteção pode ser instalada preventivamente sem exposição atual, e exposição pode existir sem proteção proposta.",
+      "teste_de_fronteira": "Avaliar separadamente estado inicial de exposição e função do escopo."
+    },
+    {
+      "caracteristicas": [
+        "X39",
+        "X40",
+        "X41"
+      ],
+      "decisao": "X39 é falha de qualquer barreira crítica; X40 é desvio/condição do processo; X41 é lacuna específica de sensor, intertravamento ou redundância. X41 pode ser subtipo de X39 somente se o elemento for formalmente crítico; X40 não prova falha de barreira.",
+      "teste_de_fronteira": "Exigir, respectivamente, padrão de barreira, limite de processo e requisito de instrumentação."
+    },
+    {
+      "caracteristicas": [
+        "X11",
+        "X12",
+        "X13",
+        "X28"
+      ],
+      "decisao": "X11 descreve troca/renovação; X12 a causa de obsolescência; X13 o resultado de continuidade; X28 alteração funcional/configuracional. Uma troca equivalente é X11, não X28; coexistências exigem evidências independentes de causa, resultado e alteração.",
+      "teste_de_fronteira": "Registrar ativo predecessor, causa, impacto de parada e comparação funcional antes/depois."
+    }
+  ],
+  "revisao_especialistas": [
+    {
+      "artefato": "C32",
+      "escopo": "pesos das características X01–X32 por classe",
+      "versao_submetida": "1.0",
+      "status": "SUBMETIDA_PENDENTE",
+      "data_submissao": "2026-08-25",
+      "revisores_requeridos": [
+        "dono do processo CAPEX",
+        "SST/segurança de processo",
+        "jurídico e conformidade",
+        "finanças/controladoria",
+        "engenharia e operações"
+      ],
+      "criterios": [
+        "coerência com este dicionário",
+        "pesos e zeros sustentados por evidência",
+        "sobreposições controladas",
+        "UNKNOWN não convertido em zero"
+      ],
+      "regra_aprovacao": "Dois especialistas, incluindo o dono do domínio afetado, devem registrar nome, data, parecer e ressalvas; mudança bloqueia liberação até nova versão."
+    },
+    {
+      "artefato": "C_EXTRA",
+      "escopo": "pesos das características X33–X42 por classe",
+      "versao_submetida": "1.0",
+      "status": "SUBMETIDA_PENDENTE",
+      "data_submissao": "2026-08-25",
+      "revisores_requeridos": [
+        "SST",
+        "segurança de processo",
+        "segurança funcional/automação",
+        "engenharia elétrica e incêndio",
+        "dono do processo CAPEX"
+      ],
+      "criterios": [
+        "coerência com este dicionário",
+        "pesos e zeros sustentados por evidência",
+        "fronteiras X34/X38 e X39/X40/X41",
+        "UNKNOWN não convertido em zero"
+      ],
+      "regra_aprovacao": "Dois especialistas, incluindo SST ou segurança de processo e o dono do domínio afetado, devem registrar nome, data, parecer e ressalvas; mudança bloqueia liberação até nova versão."
+    }
+  ],
+  "controle_versoes": {
+    "regra": "Toda alteração de definição, escala, evidência, peso de C32/C_EXTRA ou parecer deve incrementar versão semântica e incluir autor, data, itens afetados, justificativa e aprovações. Histórico é imutável.",
+    "alteracoes": [
+      {
+        "versao": "1.0.0",
+        "data": "2026-08-25",
+        "autor": "equipe do modelo (proposta para revisão)",
+        "itens_afetados": [
+          "X01–X42",
+          "C32@1.0",
+          "C_EXTRA@1.0"
+        ],
+        "alteracao": "Criação do dicionário operacional, separação explícita entre ausência e desconhecido, decisões de sobreposição e abertura das revisões especializadas.",
+        "aprovacoes": [],
+        "estado": "aguardando pareceres especializados"
+      }
+    ]
+  },
+  "caracteristicas": [
+    {
+      "codigo": "X01",
+      "nome": "Segurança ocupacional",
+      "descricao_operacional": "reduzir perigos de acidente ou doença ligados à execução do trabalho",
+      "evidencia_necessaria": "análise de risco ocupacional e controles propostos",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Segurança ocupacional.",
+        "0.5": "Presença parcial: a definição de Segurança ocupacional é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Segurança ocupacional é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Segurança ocupacional está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto elimina acesso manual a uma zona de esmagamento.",
+        "negativo": "Projeto cita segurança sem identificar perigo ocupacional."
+      },
+      "responsavel_validacao": "Especialista de SST"
+    },
+    {
+      "codigo": "X02",
+      "nome": "Segurança industrial",
+      "descricao_operacional": "prevenir evento acidental de processo com potencial de grande consequência",
+      "evidencia_necessaria": "estudo de perigos de processo (HAZOP/LOPA ou equivalente) e salvaguardas",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Segurança industrial.",
+        "0.5": "Presença parcial: a definição de Segurança industrial é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Segurança industrial é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Segurança industrial está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto instala proteção contra sobrepressão em vaso de processo.",
+        "negativo": "Compra de EPI para tarefa rotineira, sem cenário de processo."
+      },
+      "responsavel_validacao": "Especialista de segurança de processo"
+    },
+    {
+      "codigo": "X03",
+      "nome": "Requisito legal",
+      "descricao_operacional": "cumprir obrigação imposta diretamente por lei, regulamento ou licença vigente",
+      "evidencia_necessaria": "dispositivo ou condicionante aplicável, prazo e parecer de aplicabilidade",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Requisito legal.",
+        "0.5": "Presença parcial: a definição de Requisito legal é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Requisito legal é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Requisito legal está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto atende condicionante expressa da licença de operação.",
+        "negativo": "Adoção voluntária de boa prática sem obrigação aplicável."
+      },
+      "responsavel_validacao": "Jurídico/regulatório"
+    },
+    {
+      "codigo": "X04",
+      "nome": "Gestão de riscos",
+      "descricao_operacional": "tratar risco formalmente registrado, com redução demonstrável de probabilidade ou consequência",
+      "evidencia_necessaria": "registro de risco aprovado, avaliação antes/depois e plano de tratamento",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Gestão de riscos.",
+        "0.5": "Presença parcial: a definição de Gestão de riscos é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Gestão de riscos é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Gestão de riscos está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto trata risco corporativo registrado e reduz seu nível residual.",
+        "negativo": "Projeto contém apenas uma alegação genérica de risco."
+      },
+      "responsavel_validacao": "Gestor corporativo de riscos"
+    },
+    {
+      "codigo": "X05",
+      "nome": "Aumento de capacidade",
+      "descricao_operacional": "elevar a capacidade nominal sustentável de uma unidade ou sistema",
+      "evidencia_necessaria": "memória de cálculo de capacidade atual e futura",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Aumento de capacidade.",
+        "0.5": "Presença parcial: a definição de Aumento de capacidade é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Aumento de capacidade é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Aumento de capacidade está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Nova linha eleva capacidade nominal de 100 para 130 t/h.",
+        "negativo": "Recuperação mantém a capacidade nominal existente."
+      },
+      "responsavel_validacao": "Engenharia de processo"
+    },
+    {
+      "codigo": "X06",
+      "nome": "Aumento de produção",
+      "descricao_operacional": "elevar o volume efetivamente produzido no horizonte aprovado",
+      "evidencia_necessaria": "plano de produção ou business case com volumes base e incremental",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Aumento de produção.",
+        "0.5": "Presença parcial: a definição de Aumento de produção é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Aumento de produção é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Aumento de produção está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Desgargalamento aumenta a produção anual prevista.",
+        "negativo": "Estoque maior sem aumento de produção."
+      },
+      "responsavel_validacao": "Planejamento de produção"
+    },
+    {
+      "codigo": "X07",
+      "nome": "Novo produto",
+      "descricao_operacional": "habilitar produto ou especificação comercial ainda não fabricada pela unidade",
+      "evidencia_necessaria": "portfólio aprovado, especificação e prova de inexistência na linha atual",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Novo produto.",
+        "0.5": "Presença parcial: a definição de Novo produto é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Novo produto é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Novo produto está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Equipamento habilita uma nova liga para venda.",
+        "negativo": "Mudança de embalagem de produto existente."
+      },
+      "responsavel_validacao": "Gestão de produto"
+    },
+    {
+      "codigo": "X08",
+      "nome": "Novo mercado",
+      "descricao_operacional": "viabilizar atendimento a segmento ou geografia ainda não atendidos",
+      "evidencia_necessaria": "estudo comercial, cliente/segmento alvo e requisito de entrada",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Novo mercado.",
+        "0.5": "Presença parcial: a definição de Novo mercado é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Novo mercado é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Novo mercado está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Certificação e ativo permitem entrada no mercado ferroviário.",
+        "negativo": "Venda adicional ao mercado já atendido."
+      },
+      "responsavel_validacao": "Área comercial"
+    },
+    {
+      "codigo": "X09",
+      "nome": "Redução de custos",
+      "descricao_operacional": "reduzir custo operacional recorrente em base comparável",
+      "evidencia_necessaria": "baseline financeiro, cálculo da economia e premissas aprovadas",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Redução de custos.",
+        "0.5": "Presença parcial: a definição de Redução de custos é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Redução de custos é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Redução de custos está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Automação reduz consumo anual comprovado de insumo.",
+        "negativo": "Economia não quantificada ou apenas transferência de centro de custo."
+      },
+      "responsavel_validacao": "Controladoria"
+    },
+    {
+      "codigo": "X10",
+      "nome": "Melhoria da qualidade",
+      "descricao_operacional": "melhorar indicador mensurável de conformidade ou desempenho do produto",
+      "evidencia_necessaria": "baseline e meta de qualidade, especificação e plano de medição",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Melhoria da qualidade.",
+        "0.5": "Presença parcial: a definição de Melhoria da qualidade é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Melhoria da qualidade é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Melhoria da qualidade está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto reduz refugo por defeito dimensional.",
+        "negativo": "Aumento de produção sem indicador de qualidade."
+      },
+      "responsavel_validacao": "Gestão da qualidade"
+    },
+    {
+      "codigo": "X11",
+      "nome": "Substituição / renovação",
+      "descricao_operacional": "trocar ativo existente por decisão de renovação, preservando essencialmente sua função",
+      "evidencia_necessaria": "inventário, condição do ativo e escopo de retirada/substituição",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Substituição / renovação.",
+        "0.5": "Presença parcial: a definição de Substituição / renovação é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Substituição / renovação é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Substituição / renovação está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Motor antigo é substituído por equivalente funcional.",
+        "negativo": "Instalação de equipamento sem ativo predecessor."
+      },
+      "responsavel_validacao": "Engenharia de manutenção"
+    },
+    {
+      "codigo": "X12",
+      "nome": "Obsolescência",
+      "descricao_operacional": "eliminar indisponibilidade de suporte, peças, competência ou compatibilidade de tecnologia legada",
+      "evidencia_necessaria": "declaração do fabricante, análise de suporte/peças ou roadmap tecnológico",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Obsolescência.",
+        "0.5": "Presença parcial: a definição de Obsolescência é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Obsolescência é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Obsolescência está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Controlador sem suporte do fabricante é migrado.",
+        "negativo": "Ativo antigo, porém suportado e com peças disponíveis."
+      },
+      "responsavel_validacao": "Arquitetura/engenharia da disciplina"
+    },
+    {
+      "codigo": "X13",
+      "nome": "Continuidade operacional",
+      "descricao_operacional": "evitar interrupção material da operação ou recuperar confiabilidade necessária",
+      "evidencia_necessaria": "histórico de falhas, criticidade, impacto de parada e meta de disponibilidade",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Continuidade operacional.",
+        "0.5": "Presença parcial: a definição de Continuidade operacional é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Continuidade operacional é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Continuidade operacional está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Redundância evita parada total após falha única comprovada.",
+        "negativo": "Melhoria conveniente sem impacto de interrupção."
+      },
+      "responsavel_validacao": "Engenharia de confiabilidade"
+    },
+    {
+      "codigo": "X14",
+      "nome": "Grande reforma / reconstrução",
+      "descricao_operacional": "restaurar extensivamente um ativo mediante reforma estrutural ou reconstrução",
+      "evidencia_necessaria": "laudo de integridade, escopo físico e critério de vida estendida",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Grande reforma / reconstrução.",
+        "0.5": "Presença parcial: a definição de Grande reforma / reconstrução é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Grande reforma / reconstrução é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Grande reforma / reconstrução está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Forno recebe reconstrução integral do refratário e estrutura.",
+        "negativo": "Manutenção preventiva rotineira."
+      },
+      "responsavel_validacao": "Engenharia de integridade"
+    },
+    {
+      "codigo": "X15",
+      "nome": "Meio ambiente",
+      "descricao_operacional": "reduzir impacto ambiental material ou assegurar desempenho ambiental além de tema específico",
+      "evidencia_necessaria": "aspecto/impacto ambiental, baseline, meta e avaliação técnica",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Meio ambiente.",
+        "0.5": "Presença parcial: a definição de Meio ambiente é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Meio ambiente é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Meio ambiente está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto reduz emissão atmosférica particulada medida.",
+        "negativo": "Benefício ambiental alegado sem aspecto ou indicador."
+      },
+      "responsavel_validacao": "Especialista ambiental"
+    },
+    {
+      "codigo": "X16",
+      "nome": "Efluentes / resíduos",
+      "descricao_operacional": "reduzir geração, periculosidade, descarte ou melhorar tratamento de efluentes e resíduos",
+      "evidencia_necessaria": "balanço de massa, classificação, licença e desempenho do tratamento",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Efluentes / resíduos.",
+        "0.5": "Presença parcial: a definição de Efluentes / resíduos é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Efluentes / resíduos é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Efluentes / resíduos está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Estação reduz carga contaminante do efluente.",
+        "negativo": "Limpeza administrativa sem mudança no fluxo de resíduos."
+      },
+      "responsavel_validacao": "Especialista ambiental de efluentes e resíduos"
+    },
+    {
+      "codigo": "X17",
+      "nome": "Tecnologia da informação",
+      "descricao_operacional": "implantar ou alterar sistemas, infraestrutura ou serviços digitais de informação",
+      "evidencia_necessaria": "arquitetura, requisitos, segurança e aceite do responsável de TI",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Tecnologia da informação.",
+        "0.5": "Presença parcial: a definição de Tecnologia da informação é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Tecnologia da informação é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Tecnologia da informação está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Migração do ERP para infraestrutura aprovada.",
+        "negativo": "Controlador puramente operacional sem componente de TI corporativa."
+      },
+      "responsavel_validacao": "Arquitetura de TI e segurança da informação"
+    },
+    {
+      "codigo": "X18",
+      "nome": "Pesquisa e desenvolvimento",
+      "descricao_operacional": "gerar conhecimento ou tecnologia nova por investigação estruturada",
+      "evidencia_necessaria": "hipótese, plano experimental, incertezas e critérios de sucesso",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Pesquisa e desenvolvimento.",
+        "0.5": "Presença parcial: a definição de Pesquisa e desenvolvimento é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Pesquisa e desenvolvimento é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Pesquisa e desenvolvimento está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Pesquisa testa nova rota metalúrgica ainda não dominada.",
+        "negativo": "Compra de tecnologia comercial comprovada."
+      },
+      "responsavel_validacao": "Líder de P&D"
+    },
+    {
+      "codigo": "X19",
+      "nome": "Estudo / piloto / protótipo",
+      "descricao_operacional": "validar viabilidade ou desempenho antes da implantação definitiva",
+      "evidencia_necessaria": "protocolo de teste, escala, critérios de decisão e entregáveis",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Estudo / piloto / protótipo.",
+        "0.5": "Presença parcial: a definição de Estudo / piloto / protótipo é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Estudo / piloto / protótipo é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Estudo / piloto / protótipo está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Piloto mede desempenho antes do investimento industrial.",
+        "negativo": "Implantação definitiva sem etapa experimental."
+      },
+      "responsavel_validacao": "Engenharia de inovação/pilotos"
+    },
+    {
+      "codigo": "X20",
+      "nome": "SPA / obrigação contratual",
+      "descricao_operacional": "cumprir obrigação de contrato, acordo de compra e venda ou compromisso vinculante",
+      "evidencia_necessaria": "cláusula aplicável, responsável, prazo e parecer contratual",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de SPA / obrigação contratual.",
+        "0.5": "Presença parcial: a definição de SPA / obrigação contratual é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que SPA / obrigação contratual é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se SPA / obrigação contratual está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto executa obrigação explícita de SPA assinado.",
+        "negativo": "Promessa comercial não vinculante."
+      },
+      "responsavel_validacao": "Jurídico contratual"
+    },
+    {
+      "codigo": "X21",
+      "nome": "Cilindros de laminação",
+      "descricao_operacional": "adquirir, recuperar ou adequar cilindros usados no processo de laminação",
+      "evidencia_necessaria": "especificação técnica, plano de cilindros e vínculo com laminador",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Cilindros de laminação.",
+        "0.5": "Presença parcial: a definição de Cilindros de laminação é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Cilindros de laminação é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Cilindros de laminação está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Aquisição de cilindros de trabalho para laminador.",
+        "negativo": "Rolo transportador que não exerce função de laminação."
+      },
+      "responsavel_validacao": "Especialista de laminação"
+    },
+    {
+      "codigo": "X22",
+      "nome": "Redução de CO2",
+      "descricao_operacional": "reduzir emissões de gases de efeito estufa expressas em CO2 equivalente",
+      "evidencia_necessaria": "inventário segundo método aprovado e cálculo tCO2e antes/depois",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Redução de CO2.",
+        "0.5": "Presença parcial: a definição de Redução de CO2 é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Redução de CO2 é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Redução de CO2 está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Eletrificação reduz emissões anuais calculadas em tCO2e.",
+        "negativo": "Redução de poluente local sem impacto demonstrado em GEE."
+      },
+      "responsavel_validacao": "Especialista de inventário de GEE"
+    },
+    {
+      "codigo": "X23",
+      "nome": "Mudança de combustível",
+      "descricao_operacional": "substituir total ou parcialmente o combustível energético usado",
+      "evidencia_necessaria": "balanço energético, combustíveis base/futuro e adequações",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Mudança de combustível.",
+        "0.5": "Presença parcial: a definição de Mudança de combustível é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Mudança de combustível é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Mudança de combustível está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Forno migra de óleo combustível para gás.",
+        "negativo": "Troca de fornecedor do mesmo combustível."
+      },
+      "responsavel_validacao": "Engenharia térmica/energia"
+    },
+    {
+      "codigo": "X24",
+      "nome": "Rejeitos",
+      "descricao_operacional": "alterar geração, processamento, transporte ou disposição de rejeitos de processo mineral",
+      "evidencia_necessaria": "balanço de rejeitos, caracterização e fluxograma",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Rejeitos.",
+        "0.5": "Presença parcial: a definição de Rejeitos é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Rejeitos é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Rejeitos está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Filtragem reduz água em rejeito mineral.",
+        "negativo": "Resíduo industrial comum não classificado como rejeito mineral."
+      },
+      "responsavel_validacao": "Especialista de rejeitos"
+    },
+    {
+      "codigo": "X25",
+      "nome": "Barragem / armazenamento rejeitos",
+      "descricao_operacional": "implantar, modificar, descaracterizar ou controlar estrutura de contenção/armazenamento de rejeitos",
+      "evidencia_necessaria": "projeto geotécnico, cadastro da estrutura e parecer do responsável técnico",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Barragem / armazenamento rejeitos.",
+        "0.5": "Presença parcial: a definição de Barragem / armazenamento rejeitos é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Barragem / armazenamento rejeitos é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Barragem / armazenamento rejeitos está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Obra reforça estrutura de contenção de rejeitos.",
+        "negativo": "Pátio de resíduos sem barramento ou armazenamento de rejeitos."
+      },
+      "responsavel_validacao": "Engenheiro geotécnico responsável"
+    },
+    {
+      "codigo": "X26",
+      "nome": "Retorno financeiro",
+      "descricao_operacional": "ter decisão sustentada por retorno econômico incremental mensurado",
+      "evidencia_necessaria": "fluxo de caixa aprovado e indicador econômico com premissas",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Retorno financeiro.",
+        "0.5": "Presença parcial: a definição de Retorno financeiro é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Retorno financeiro é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Retorno financeiro está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Business case apresenta VPL e TIR aprovados.",
+        "negativo": "Projeto obrigatório sem benefício financeiro incremental calculado."
+      },
+      "responsavel_validacao": "Finanças/Controladoria"
+    },
+    {
+      "codigo": "X27",
+      "nome": "Nova instalação / greenfield",
+      "descricao_operacional": "criar unidade física autônoma em local sem instalação operacional equivalente",
+      "evidencia_necessaria": "estudo de implantação, layout, terreno e definição greenfield aprovada",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Nova instalação / greenfield.",
+        "0.5": "Presença parcial: a definição de Nova instalação / greenfield é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Nova instalação / greenfield é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Nova instalação / greenfield está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Construção de nova planta em terreno não industrializado.",
+        "negativo": "Ampliação dentro de planta existente."
+      },
+      "responsavel_validacao": "Engenharia de implantação"
+    },
+    {
+      "codigo": "X28",
+      "nome": "Modificação ativo existente",
+      "descricao_operacional": "alterar configuração, função ou desempenho de ativo existente sem mera troca equivalente",
+      "evidencia_necessaria": "desenho antes/depois, tag do ativo e gestão de mudança",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Modificação ativo existente.",
+        "0.5": "Presença parcial: a definição de Modificação ativo existente é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Modificação ativo existente é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Modificação ativo existente está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Bomba existente recebe novo arranjo e função operacional.",
+        "negativo": "Troca equivalente sem alteração funcional."
+      },
+      "responsavel_validacao": "Engenharia proprietária do ativo"
+    },
+    {
+      "codigo": "X29",
+      "nome": "Melhoria tecnológica normal",
+      "descricao_operacional": "adotar tecnologia madura para melhoria incremental, sem incerteza tecnológica relevante",
+      "evidencia_necessaria": "benchmark, maturidade da solução e benefícios incrementais",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Melhoria tecnológica normal.",
+        "0.5": "Presença parcial: a definição de Melhoria tecnológica normal é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Melhoria tecnológica normal é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Melhoria tecnológica normal está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Drive comercial maduro melhora controle de motor.",
+        "negativo": "Tecnologia experimental sem desempenho demonstrado."
+      },
+      "responsavel_validacao": "Especialista técnico da disciplina"
+    },
+    {
+      "codigo": "X30",
+      "nome": "Incerteza tecnológica",
+      "descricao_operacional": "depender de solução cujo desempenho técnico relevante ainda não está demonstrado no contexto",
+      "evidencia_necessaria": "registro de incertezas, nível de maturidade e plano de validação",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Incerteza tecnológica.",
+        "0.5": "Presença parcial: a definição de Incerteza tecnológica é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Incerteza tecnológica é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Incerteza tecnológica está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Processo em baixa maturidade pode não atingir rendimento alvo.",
+        "negativo": "Solução padronizada já operando em contexto equivalente."
+      },
+      "responsavel_validacao": "Comitê técnico de inovação"
+    },
+    {
+      "codigo": "X31",
+      "nome": "Redução capital de giro",
+      "descricao_operacional": "reduzir recursos financeiros presos em estoques, recebíveis ou ciclo operacional",
+      "evidencia_necessaria": "baseline e projeção financeira de capital de giro",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Redução capital de giro.",
+        "0.5": "Presença parcial: a definição de Redução capital de giro é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Redução capital de giro é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Redução capital de giro está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Sistema reduz estoque de segurança quantificado.",
+        "negativo": "Redução de custo operacional sem efeito no capital de giro."
+      },
+      "responsavel_validacao": "Tesouraria/Controladoria"
+    },
+    {
+      "codigo": "X32",
+      "nome": "Capitalização / monitoramento especial",
+      "descricao_operacional": "exigir tratamento contábil de capitalização ou monitoramento corporativo especial formalmente definido",
+      "evidencia_necessaria": "parecer contábil e enquadramento no processo especial aplicável",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Capitalização / monitoramento especial.",
+        "0.5": "Presença parcial: a definição de Capitalização / monitoramento especial é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Capitalização / monitoramento especial é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Capitalização / monitoramento especial está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Controladoria determina acompanhamento especial do investimento capitalizável.",
+        "negativo": "Projeto apenas possui orçamento CAPEX, sem enquadramento especial."
+      },
+      "responsavel_validacao": "Contabilidade de ativos"
+    },
+    {
+      "codigo": "X33",
+      "nome": "Adequação normativa",
+      "descricao_operacional": "atender norma técnica, padrão interno ou código aplicável que não constitui por si só obrigação legal direta",
+      "evidencia_necessaria": "norma e cláusula aplicáveis, análise de lacuna e aceite técnico",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Adequação normativa.",
+        "0.5": "Presença parcial: a definição de Adequação normativa é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Adequação normativa é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Adequação normativa está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Projeto fecha lacuna contra norma técnica corporativa obrigatória.",
+        "negativo": "Lei ou licença é a única origem da obrigação."
+      },
+      "responsavel_validacao": "Especialista de normas e conformidade"
+    },
+    {
+      "codigo": "X34",
+      "nome": "Proteção de pessoas / operadores",
+      "descricao_operacional": "introduzir barreira projetada para proteger pessoas, sem exigir que a exposição direta seja o motivador comprovado",
+      "evidencia_necessaria": "projeto da barreira, perigo protegido e verificação funcional",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Proteção de pessoas / operadores.",
+        "0.5": "Presença parcial: a definição de Proteção de pessoas / operadores é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Proteção de pessoas / operadores é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Proteção de pessoas / operadores está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Guarda física impede contato do operador com parte móvel.",
+        "negativo": "Proteção exclusiva do equipamento contra dano."
+      },
+      "responsavel_validacao": "Engenharia de segurança de máquinas/SST"
+    },
+    {
+      "codigo": "X35",
+      "nome": "Proteção de máquinas / equipamentos",
+      "descricao_operacional": "proteger integridade de máquinas ou equipamentos contra dano ou falha",
+      "evidencia_necessaria": "análise de modos de falha e especificação da proteção",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Proteção de máquinas / equipamentos.",
+        "0.5": "Presença parcial: a definição de Proteção de máquinas / equipamentos é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Proteção de máquinas / equipamentos é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Proteção de máquinas / equipamentos está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Relé protege motor contra sobrecarga.",
+        "negativo": "Guarda destinada apenas a impedir contato humano."
+      },
+      "responsavel_validacao": "Engenharia de confiabilidade"
+    },
+    {
+      "codigo": "X36",
+      "nome": "Proteção contra incêndio",
+      "descricao_operacional": "prevenir, detectar, conter ou suprimir incêndio",
+      "evidencia_necessaria": "estudo de incêndio, cobertura e critérios de projeto/teste",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Proteção contra incêndio.",
+        "0.5": "Presença parcial: a definição de Proteção contra incêndio é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Proteção contra incêndio é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Proteção contra incêndio está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Sistema de detecção e supressão protege sala elétrica.",
+        "negativo": "Sensor de processo sem função de incêndio."
+      },
+      "responsavel_validacao": "Engenharia de proteção contra incêndio"
+    },
+    {
+      "codigo": "X37",
+      "nome": "Segurança elétrica / SPDA",
+      "descricao_operacional": "controlar choque, arco elétrico, aterramento ou descargas atmosféricas",
+      "evidencia_necessaria": "estudo elétrico/SPDA, norma aplicável e testes",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Segurança elétrica / SPDA.",
+        "0.5": "Presença parcial: a definição de Segurança elétrica / SPDA é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Segurança elétrica / SPDA é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Segurança elétrica / SPDA está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Adequação do aterramento reduz tensão de toque.",
+        "negativo": "Melhoria de eficiência elétrica sem risco elétrico."
+      },
+      "responsavel_validacao": "Engenheiro eletricista responsável"
+    },
+    {
+      "codigo": "X38",
+      "nome": "Exposição direta de pessoas ao risco",
+      "descricao_operacional": "caracterizar situação em que pessoas estão diretamente expostas a perigo identificado no cenário atual",
+      "evidencia_necessaria": "análise de tarefa com pessoas, frequência, perigo e via de exposição",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Exposição direta de pessoas ao risco.",
+        "0.5": "Presença parcial: a definição de Exposição direta de pessoas ao risco é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Exposição direta de pessoas ao risco é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Exposição direta de pessoas ao risco está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Operador entra diariamente em zona de calor perigoso.",
+        "negativo": "Existe perigo confinado sem acesso ou exposição humana plausível."
+      },
+      "responsavel_validacao": "Higiene ocupacional/SST"
+    },
+    {
+      "codigo": "X39",
+      "nome": "Deficiência de barreiras / controles críticos",
+      "descricao_operacional": "registrar barreira crítica ausente, degradada ou ineficaz em cenário de risco identificado",
+      "evidencia_necessaria": "bow-tie ou análise equivalente, padrão de desempenho e teste da barreira",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Deficiência de barreiras / controles críticos.",
+        "0.5": "Presença parcial: a definição de Deficiência de barreiras / controles críticos é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Deficiência de barreiras / controles críticos é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Deficiência de barreiras / controles críticos está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Teste comprova que barreira crítica não cumpre seu padrão.",
+        "negativo": "Desvio de processo sem falha de barreira identificada."
+      },
+      "responsavel_validacao": "Especialista de controles críticos"
+    },
+    {
+      "codigo": "X40",
+      "nome": "Condição crítica / desvio do processo",
+      "descricao_operacional": "registrar condição operacional fora de limite seguro ou desvio precursor relevante",
+      "evidencia_necessaria": "tendência de processo, limite aprovado, evento e avaliação de criticidade",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Condição crítica / desvio do processo.",
+        "0.5": "Presença parcial: a definição de Condição crítica / desvio do processo é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Condição crítica / desvio do processo é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Condição crítica / desvio do processo está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Pressão opera repetidamente acima do limite seguro.",
+        "negativo": "Barreira indisponível com processo dentro dos limites e sem desvio."
+      },
+      "responsavel_validacao": "Engenharia de processo/operação"
+    },
+    {
+      "codigo": "X41",
+      "nome": "Falta de sensor / intertravamento / redundância",
+      "descricao_operacional": "identificar ausência específica de instrumentação, intertravamento ou redundância requerida",
+      "evidencia_necessaria": "filosofia de controle, causa e efeito, requisito e levantamento em campo",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Falta de sensor / intertravamento / redundância.",
+        "0.5": "Presença parcial: a definição de Falta de sensor / intertravamento / redundância é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Falta de sensor / intertravamento / redundância é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Falta de sensor / intertravamento / redundância está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Análise identifica intertravamento requerido e inexistente.",
+        "negativo": "Sensor existe e atende integralmente ao requisito."
+      },
+      "responsavel_validacao": "Engenharia de automação e segurança funcional"
+    },
+    {
+      "codigo": "X42",
+      "nome": "Automação para redução da exposição humana",
+      "descricao_operacional": "automatizar tarefa com redução demonstrável da presença humana em zona de perigo",
+      "evidencia_necessaria": "análise da tarefa antes/depois, arquitetura de automação e redução de exposição",
+      "escala_permitida": [
+        0,
+        0.5,
+        1,
+        "UNKNOWN"
+      ],
+      "significado_niveis": {
+        "0": "Ausência confirmada: evidência suficiente demonstra que o escopo não satisfaz a definição de Automação para redução da exposição humana.",
+        "0.5": "Presença parcial: a definição de Automação para redução da exposição humana é satisfeita, mas apenas em parte do escopo ou com efeito secundário mensurável.",
+        "1": "Presença confirmada: evidência suficiente demonstra que Automação para redução da exposição humana é objetivo ou efeito material do escopo.",
+        "UNKNOWN": "Informação desconhecida: documentos disponíveis não permitem decidir se Automação para redução da exposição humana está presente ou ausente; não participa do cálculo como zero."
+      },
+      "regra_informacao_desconhecida": "Use UNKNOWN quando faltar evidência mínima ou houver conflito não resolvido. Solicite complementação e validação; preserve o valor nulo/mascarado na ingestão e impeça pontuação final até resolução ou aplicação explícita de método para dados ausentes. Nunca converter UNKNOWN em 0.",
+      "exemplos": {
+        "positivo": "Operação remota elimina entrada rotineira em área perigosa.",
+        "negativo": "Automação aumenta produtividade sem alterar exposição humana."
+      },
+      "responsavel_validacao": "Engenharia de automação com validação de SST"
+    }
+  ],
+  "versao_formato": "1.0"
+}
