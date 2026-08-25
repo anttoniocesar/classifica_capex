@@ -23,6 +23,32 @@ PROJECT_METADATA = (
 )
 
 
+def project_feature_fingerprint(table):
+    """Retorna a assinatura dos 42 atributos para auditar cópias/variantes.
+
+    A assinatura não é usada como identidade do projeto: projetos distintos podem
+    legitimamente receber a mesma codificação. Ela serve para produzir candidatos
+    à revisão humana antes de qualquer divisão da amostra.
+    """
+    import hashlib
+
+    values = _numeric_features(table, "projetos para assinatura")
+    return [hashlib.sha256(row.astype("<f8").tobytes()).hexdigest() for row in values]
+
+
+def find_cross_partition_feature_duplicates(partitions):
+    """Lista vetores idênticos que foram colocados em partições diferentes."""
+    occurrences = {}
+    for partition, table in partitions.items():
+        for code, fingerprint in zip(table["project_code"], project_feature_fingerprint(table)):
+            occurrences.setdefault(fingerprint, []).append((partition, code))
+    return {
+        fingerprint: projects
+        for fingerprint, projects in occurrences.items()
+        if len({partition for partition, _ in projects}) > 1
+    }
+
+
 def _read_csv(path):
     path = Path(path)
     if not path.is_file():
