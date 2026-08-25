@@ -3,7 +3,9 @@ import pytest
 
 from src.classifier import (
     DECISION_CLASSIFIED,
-    DECISION_REVIEW_REQUIRED,
+    DECISION_CLOSE_CLASSES,
+    DECISION_LOW_SIMILARITY,
+    calibrate_thresholds,
     calculate_margins,
     calculate_similarities,
     classify,
@@ -22,7 +24,8 @@ def test_classificador_conceitual_produz_decisao_completa_sem_alterar_entradas()
         concepts,
         ["A", "B"],
         project_codes=["P1", "P2"],
-        min_margin=0.1,
+        minimum_similarity=0.0,
+        minimum_margin=0.1,
     )
 
     np.testing.assert_array_equal(projects, original)
@@ -32,7 +35,26 @@ def test_classificador_conceitual_produz_decisao_completa_sem_alterar_entradas()
     assert decisions[0].second_class == "A"
     assert decisions[0].margin == pytest.approx(0.2)
     assert decisions[0].status == DECISION_CLASSIFIED
-    assert decisions[1].status == DECISION_REVIEW_REQUIRED
+    assert decisions[1].status == DECISION_CLOSE_CLASSES
+    assert decisions[1].minimum_similarity == 0.0
+    assert decisions[1].minimum_margin == 0.1
+
+
+def test_baixa_similaridade_tem_prioridade_sobre_margem():
+    _, decisions = classify(
+        [[1, 1]], [[1, 0], [0, 1]], ["A", "B"],
+        minimum_similarity=0.8, minimum_margin=0.2,
+    )
+    assert decisions[0].status == DECISION_LOW_SIMILARITY
+
+
+def test_calibracao_exige_e_usa_projetos_de_todas_as_classes():
+    scores = np.array([[0.9, 0.1], [0.2, 0.8], [0.51, 0.5]])
+    thresholds = calibrate_thresholds(scores[:2], ["A", "B"], ["A", "B"])
+    assert thresholds.development_sample_size == 2
+    assert thresholds.development_automatic_precision == 1.0
+    with pytest.raises(ValueError, match="every class"):
+        calibrate_thresholds(scores[:1], ["A"], ["A", "B"])
 
 
 def test_funcoes_intermediarias_sao_independentes():

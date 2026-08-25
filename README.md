@@ -17,6 +17,13 @@ sem treinamento e sem usar o protótipo Hebbiano. A execução padrão (`main.py
 usa esse classificador e informa, por projeto, as duas classes mais próximas,
 suas similaridades, a margem e o status da decisão.
 
+Os parâmetros `minimum_similarity` e `minimum_margin` são calibrados na
+partição de desenvolvimento, que obrigatoriamente deve conter projetos de
+todas as classes. A calibração maximiza a cobertura automática sujeita à
+precisão-alvo; ela falha explicitamente se receber apenas os 19 projetos de
+Segurança. Cada decisão e cada linha exportada registra os dois limiares usados,
+permitindo reproduzir e auditar o encaminhamento para revisão manual.
+
 ## Baseline exploratória versionada (legada)
 
 A matriz conceitual atual tem a versão `1.0`. O fluxo exploratório legado gera,
