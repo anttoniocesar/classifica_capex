@@ -8,6 +8,8 @@ from matplotlib.widgets import CheckButtons
 from sklearn.decomposition import PCA
 from scipy.stats import chi2
 
+from baseline_modelo import save_baseline
+
 # ============================================================
 # 2. FUNÇÕES AUXILIARES
 # ============================================================
@@ -126,6 +128,13 @@ OUTPUT_DIR = Path("resultados")
 OUTPUT_DIR.mkdir(exist_ok=True)
 
 ETA = 0.05
+concept_matrix_version = "1.0"
+MATRIX_VERSIONS = {
+    "C32": "1.0",
+    "C_EXTRA": "1.0",
+    "P": "1.0",
+    "V": "1.0",
+}
 
 
 # ============================================================
@@ -595,7 +604,7 @@ validation_margin = (
 )
 
 # ============================================================
-# PASSO 8 — DESCOBRIR SE A CLASSIFICAÇÃO ACERTOU
+# PASSO 8 — DIAGNÓSTICO EXPLORATÓRIO
 # ============================================================
 
 # Converte o índice da classe vencedora
@@ -606,38 +615,22 @@ validation_predicted_classes = [
 ]
 
 
-# Compara a classe prevista com a classe real
-validation_correct = [
-    predicted == real
-    for predicted, real in zip(
-        validation_predicted_classes,
-        VALIDATION_REAL_CLASSES
-    )
-]
-
-# ============================================================
-# VERIFICAÇÃO DO PASSO 8
-# ============================================================
-
 print("\n" + "=" * 70)
-print("PASSO 8 — VERIFICAÇÃO DAS CLASSIFICAÇÕES")
+print("PASSO 8 — DIAGNÓSTICO (NÃO É EVIDÊNCIA DE QUALIDADE)")
 print("=" * 70)
 
-for code, real, predicted, correct in zip(
+for code, real, predicted in zip(
     VALIDATION_CODES,
     VALIDATION_REAL_CLASSES,
     validation_predicted_classes,
-    validation_correct
 ):
-
-    resultado = "ACERTOU" if correct else "ERROU"
-
     print(
         f"{code:15s} | "
         f"Real: {real:25s} | "
-        f"Prevista: {predicted:25s} | "
-        f"{resultado}"
+        f"Prevista: {predicted:25s}"
     )
+
+print("Os dois projetos são de Segurança; não se calcula acurácia como qualidade.")
 
 # ============================================================
 # 5. PROJETOS REAIS DE SEGURANÇA
@@ -1131,6 +1124,25 @@ print(
 
 print(
     np.round(H_pca, 4)
+)
+
+baseline_metadata_path, baseline_arrays_path = save_baseline(
+    OUTPUT_DIR,
+    concept_matrix_version=concept_matrix_version,
+    matrix_versions=MATRIX_VERSIONS,
+    classes=CLASSES,
+    project_codes=PROJECT_CODES,
+    validation_codes=VALIDATION_CODES,
+    c32=C32,
+    c_extra=C_EXTRA,
+    projects=P,
+    validation_projects=V,
+    project_similarities=similarities,
+    validation_similarities=validation_similarities,
+    conceptual_security_weights=C_security,
+    normalized_conceptual_security_weights=C_security_norm,
+    hebbian_weights=W,
+    pca_explained_variance=variance,
 )
 
 print(
@@ -1674,6 +1686,8 @@ print(
 print("\nArquivos gerados:")
 print(excel_path.resolve())
 print(graph_path.resolve())
+print(baseline_metadata_path.resolve())
+print(baseline_arrays_path.resolve())
 
 # ============================================================
 # 17. ANÁLISE DE SIMILARIDADE ENTRE AS CLASSES
