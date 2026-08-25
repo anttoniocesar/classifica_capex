@@ -41,6 +41,12 @@ qualidade ou acurácia do modelo.
 
 ## Dados de entrada
 
+O [protocolo de curadoria e congelamento](docs/protocolo_curadoria_dataset.md)
+define a coleta independente da matriz conceitual, os casos de fronteira, a
+desduplicação por família e a custódia do teste. O corpus atual é legado,
+exclusivamente de Segurança, e não deve ser apresentado como avaliação das 13
+categorias; o teste continua vazio até haver dados reais suficientes.
+
 A matriz conceitual é mantida em `data/concept_matrix.csv`, com uma linha por
 classe e as 42 características canônicas. Os projetos ficam separados em
 `data/projects_train.csv`, `data/projects_validation.csv` e
