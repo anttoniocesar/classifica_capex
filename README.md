@@ -8,10 +8,19 @@ CAPEX e seus resultados.
 - [Definição do problema, custos de erro e métricas](docs/definicao_problema_metricas.md)
 - [Esquema operacional das características X01–X42](docs/esquema_caracteristicas_X01_X42.json) — inclui escala, evidências, fronteiras entre conceitos, tratamento de informação desconhecida, revisão especializada e histórico de versões
 
-## Baseline versionada
+## Baseline oficial
 
-A matriz conceitual atual tem a versão `1.0`. Ao executar o modelo, o diretório
-`resultados/baselines/1.0/` recebe:
+O primeiro baseline oficial é o **classificador conceitual por similaridade de
+cosseno** implementado em `src/classifier.py`. Ele compara explicitamente a
+matriz de características dos projetos com a matriz conceitual das classes,
+sem treinamento e sem usar o protótipo Hebbiano. A execução padrão (`main.py`)
+usa esse classificador e informa, por projeto, as duas classes mais próximas,
+suas similaridades, a margem e o status da decisão.
+
+## Baseline exploratória versionada (legada)
+
+A matriz conceitual atual tem a versão `1.0`. O fluxo exploratório legado gera,
+no diretório `resultados/baselines/1.0/`:
 
 - `baseline.json`, com versões e hashes das matrizes, primeira e segunda classes,
   respectivas similaridades, margem e variância explicada pelo PCA;
