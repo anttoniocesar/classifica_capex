@@ -24,6 +24,22 @@ precisão-alvo; ela falha explicitamente se receber apenas os 19 projetos de
 Segurança. Cada decisão e cada linha exportada registra os dois limiares usados,
 permitindo reproduzir e auditar o encaminhamento para revisão manual.
 
+## Análise de sensibilidade
+
+`python run_sensitivity.py` executa uma grade controlada (um fator por vez) para
+os pesos dos blocos C32 e C_EXTRA, ETA, similaridade mínima, margem mínima e,
+no modo sequencial, sementes que determinam a ordem dos projetos. O relatório
+registra métricas de Segurança e macro, decisões alteradas em relação à
+referência, revisões manuais e projetos instáveis em
+`resultados/sensibilidade/`.
+
+A escolha é feita exclusivamente com treino e validação. O script não carrega
+a partição de teste, não passa seus dados à análise e não calcula métricas
+nela. Como o corpus atual de
+treino e validação contém somente Segurança, as métricas macro não constituem
+evidência multiclasse; o relatório serve como infraestrutura e diagnóstico até
+que a curadoria forneça validação representativa das 13 categorias.
+
 ## Protótipo histórico de Segurança
 
 O protótipo histórico direcional normaliza cada projeto antes de calcular o
