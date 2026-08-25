@@ -13,6 +13,49 @@ SECURITY_LABEL = "Cat 1 - Segurança"
 MANUAL_REVIEW_LABEL = "Revisão manual"
 
 
+def evaluate_historical_prototype(
+    independent_projects,
+    true_classes,
+    class_concept_matrix,
+    class_names,
+    historical_security_projects,
+    *,
+    security_class_index=0,
+):
+    """Compara conceito e protótipo no mesmo conjunto independente.
+
+    O retorno separa os dois resultados e seus scores, tornando explícito que
+    esta é uma comparação pareada. Não há calibração nem escolha de limiar no
+    teste: ambos usam apenas a classe de maior similaridade. O protótipo altera
+    exclusivamente o score de Segurança.
+    """
+    from .classifier import (
+        calculate_historical_security_similarities,
+        calculate_similarities,
+    )
+
+    classes = list(class_names)
+    if not 0 <= security_class_index < len(classes):
+        raise ValueError("security_class_index is outside class_names")
+    conceptual_scores = calculate_similarities(
+        independent_projects, class_concept_matrix
+    )
+    historical_scores = calculate_historical_security_similarities(
+        independent_projects,
+        class_concept_matrix,
+        historical_security_projects,
+        security_class_index=security_class_index,
+    )
+    conceptual_predictions = [classes[index] for index in conceptual_scores.argmax(axis=1)]
+    historical_predictions = [classes[index] for index in historical_scores.argmax(axis=1)]
+    return {
+        "conceptual": evaluate(true_classes, conceptual_predictions, classes),
+        "historical_security": evaluate(true_classes, historical_predictions, classes),
+        "conceptual_scores": conceptual_scores,
+        "historical_security_scores": historical_scores,
+    }
+
+
 def _safe_divide(numerator, denominator):
     """Divide contagens, usando zero para uma métrica sem denominador."""
     return float(numerator / denominator) if denominator else 0.0

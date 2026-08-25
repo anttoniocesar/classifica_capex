@@ -1,6 +1,6 @@
 import numpy as np
 
-from src.evaluation import MANUAL_REVIEW_LABEL, evaluate
+from src.evaluation import MANUAL_REVIEW_LABEL, evaluate, evaluate_historical_prototype
 
 
 LABELS = ["Cat 1 - Segurança", "Cat 2", "Cat 3"]
@@ -55,3 +55,19 @@ def test_evaluate_trata_recorte_automatico_vazio():
     np.testing.assert_array_equal(
         result["automatic_decisions"]["confusion_matrix"], np.zeros((3, 3), dtype=int)
     )
+
+
+def test_avaliacao_do_prototipo_reutiliza_o_mesmo_conjunto_independente():
+    result = evaluate_historical_prototype(
+        [[1.0, 1.0], [0.0, 1.0]],
+        ["Segurança", "Outra"],
+        [[1.0, 0.0], [0.0, 1.0]],
+        ["Segurança", "Outra"],
+        [[1.0, 1.0]],
+    )
+
+    assert result["conceptual"]["sample_count"] == 2
+    assert result["historical_security"]["sample_count"] == 2
+    np.testing.assert_allclose(result["conceptual_scores"][:, 1], [2 ** -0.5, 1.0])
+    np.testing.assert_allclose(result["historical_security_scores"][:, 1], [2 ** -0.5, 1.0])
+    assert result["historical_security_scores"][0, 0] == 1.0
