@@ -106,11 +106,11 @@ def plot_dispersion_ellipsoid_3d(
     return center, radii
 
 
-def save_pca_plot(
-    path, concepts, projects, class_names, *, data_version="não informada",
+def create_pca_figure(
+    concepts, projects, class_names, *, data_version="não informada",
     model_version="não informada", project_label="Projetos",
 ):
-    """Salva a projeção 3D com variância, limitação e versões visíveis."""
+    """Cria a figura PCA 3D sem a exibir, salvar ou fechar."""
     import matplotlib.pyplot as plt
 
     projection = project_pca(concepts, projects)
@@ -139,6 +139,27 @@ def save_pca_plot(
     fig.text(0.02, 0.02, note, fontsize=9)
     ax.legend(loc="upper left")
     fig.tight_layout(rect=(0, 0.10, 1, 1))
+    # Mantém as coordenadas disponíveis para o adaptador legado de salvamento.
+    fig._capex_pca_points = (concept_points, project_points)
+    return fig
+
+
+def save_pca_plot(
+    path, concepts, projects, class_names, *, data_version="não informada",
+    model_version="não informada", project_label="Projetos",
+):
+    """Salva e fecha uma figura PCA, preservando o retorno histórico."""
+    import matplotlib.pyplot as plt
+
+    fig = create_pca_figure(
+        concepts,
+        projects,
+        class_names,
+        data_version=data_version,
+        model_version=model_version,
+        project_label=project_label,
+    )
+    concept_points, project_points = fig._capex_pca_points
     fig.savefig(path, dpi=160, bbox_inches="tight")
     plt.close(fig)
     return concept_points, project_points

@@ -14,7 +14,7 @@ from .config import CONCEPT_MATRIX_VERSION, ETA, OUTPUT_DIR
 from .data import load_concept_matrices, load_project_partitions
 from .hebbian import train_hebbian
 from .schema import CLASSES, FEATURES
-from .visualization import save_pca_plot
+from .visualization import create_pca_figure
 
 
 DEFAULT_THRESHOLDS = {"minimum_similarity": 0.70, "minimum_margin": 0.10}
@@ -75,8 +75,12 @@ class MenuService:
         )
         return TrainingResult(path, len(security), len(history))
 
-    def create_3d_chart(self) -> Path:
-        """Gera o gráfico PCA 3D com os projetos de treino e validação."""
+    def create_3d_chart(self, *, export=False):
+        """Cria o gráfico PCA 3D e, opcionalmente, exporta uma cópia PNG.
+
+        Retorna a figura aberta para que a interface possa incorporá-la e o
+        caminho exportado (ou ``None`` quando ``export`` for falso).
+        """
         _, _, concepts = load_concept_matrices()
         partitions = load_project_partitions()
         projects = np.vstack(
@@ -86,17 +90,19 @@ class MenuService:
                 if len(table)
             ]
         )
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-        path = self.output_dir / "pca_3d_menu.png"
-        save_pca_plot(
-            path,
+        figure = create_pca_figure(
             concepts,
             projects,
             CLASSES,
             data_version="partições versionadas",
             model_version=CONCEPT_MATRIX_VERSION,
         )
-        return path
+        path = None
+        if export:
+            self.output_dir.mkdir(parents=True, exist_ok=True)
+            path = self.output_dir / "pca_3d_menu.png"
+            figure.savefig(path, dpi=160, bbox_inches="tight")
+        return figure, path
 
 
 class MenuApp:
@@ -220,16 +226,43 @@ class MenuApp:
         )
 
     def show_3d_chart(self):
+        import tkinter as tk
+        from tkinter import ttk
         from tkinter import messagebox
 
         try:
-            path = self.service.create_3d_chart()
-            self.root.tk.call("tk", "scaling")  # confirma que a janela segue ativa
-            import webbrowser
-
-            webbrowser.open(path.resolve().as_uri())
+            figure, _ = self.service.create_3d_chart()
         except (OSError, ValueError) as error:
             messagebox.showerror("Falha ao gerar gráfico", str(error), parent=self.root)
+            return
+
+        from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+        import matplotlib.pyplot as plt
+
+        window = tk.Toplevel(self.root)
+        window.title("PCA 3D exploratório")
+        window.geometry("1000x720")
+        ttk.Label(
+            window,
+            text=(
+                "Arraste com o botão esquerdo para rotacionar e use a roda do "
+                "mouse para zoom. A projeção PCA é apenas exploratória."
+            ),
+            padding=(12, 8),
+            wraplength=960,
+        ).pack(fill="x")
+        canvas = FigureCanvasTkAgg(figure, master=window)
+        canvas.draw()
+        toolbar = NavigationToolbar2Tk(canvas, window, pack_toolbar=False)
+        toolbar.update()
+        toolbar.pack(side="bottom", fill="x")
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+        def close_chart():
+            plt.close(figure)
+            window.destroy()
+
+        window.protocol("WM_DELETE_WINDOW", close_chart)
 
 
 def main():
