@@ -3,6 +3,15 @@
 Este repositório reúne o modelo exploratório de classificação de projetos
 CAPEX e seus resultados.
 
+## Menu gráfico
+
+Execute `python menu.py` para abrir o formulário desktop. O menu permite
+classificar um projeto preenchendo as 42 características, treinar o protótipo
+Hebbiano de Segurança e gerar/abrir a visualização PCA 3D. Como os dados atuais
+possuem exemplos apenas de Segurança, a opção de treino não é apresentada como
+um treinamento multiclasse; ela grava o artefato auditável
+`resultados/prototipo_hebbiano_seguranca.npz`.
+
 ## Documentação de negócio
 
 - [Definição do problema, custos de erro e métricas](docs/definicao_problema_metricas.md)
